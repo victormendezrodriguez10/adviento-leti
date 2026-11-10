@@ -351,7 +351,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
     <p class="trineo" aria-hidden="true"><span class="luna"></span>🦌🦌🦌🛷🎅</p>
     <p class="eyebrow" id="eyebrow">Diciembre 2026 · 31 puertas</p>
     <h1 id="titulo">El calendario de adviento de <b>Leti</b></h1>
-    <p class="sub">Los elfos han preparado una puerta para cada día de diciembre. Detrás de cada una, un plan solo para nosotros dos.</p>
+    <p class="sub">Los elfos han preparado una puerta para cada día de diciembre. Detrás de cada una, un regalo solo para ti.</p>
     <p class="saludo" id="saludo"></p>
     <div class="estados">
       <div class="estado" id="estado" aria-live="polite"><span class="elfo" aria-hidden="true">🧝</span><span id="estado-texto">Cargando…</span></div>
@@ -397,7 +397,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
       <p class="nota-guardado" id="n-guardado"></p>
     </div>
     <div class="acciones">
-      <button type="button" class="boton" id="t-canjear">Canjear este plan</button>
+      <button type="button" class="boton" id="t-canjear">Canjear este regalo</button>
       <button type="button" class="boton secundario" id="t-cerrar">Guardar para luego</button>
     </div>
   </div>
@@ -416,8 +416,8 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
   <div class="tarjeta navidad">
     <div class="icono">🎄</div>
     <h2 id="b-titulo">Hola, Leti</h2>
-    <p class="texto">Esto es un calendario de adviento solo para ti. Treinta y una puertas, una por cada día de diciembre, y detrás de cada una un plan para los dos.</p>
-    <p class="texto">Cada mañana a las 07:00 se abre una nueva. Puedes canjear cada plan cuando lo hagamos y guardar aquí una nota o una foto de ese día.</p>
+    <p class="texto">Esto es un calendario de adviento solo para ti. Treinta y una puertas, una por cada día de diciembre, y detrás de cada una un regalo para ti.</p>
+    <p class="texto">Cada mañana a las 07:00 se abre una nueva. Puedes canjear cada regalo cuando lo abramos juntos y guardar aquí una nota o una foto de ese día.</p>
     <p class="firma">Con todo mi cariño, Vic</p>
     <div class="acciones"><button type="button" class="boton" id="b-cerrar">Abrir mi calendario</button></div>
   </div>
@@ -633,7 +633,7 @@ function actualizarEstado() {
   let saludo;
   if (enDiciembre && SORPRESAS[ahora.getDate() - 1]) {
     const s = SORPRESAS[ahora.getDate() - 1];
-    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'la cena de Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'plan de salir' : 'plan en casa';
+    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'la cena de Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'un regalo para salir de casa' : 'un regalo para disfrutar en casa';
     saludo = hola + ', Leti. Hoy es ' + DIAS_SEMANA[ahora.getDay()] + ' y los elfos traen ' + plan + '.';
   } else if (t0 < inicio) {
     saludo = hola + ', Leti. Los elfos están terminando de envolver las puertas.';
@@ -722,7 +722,7 @@ function pintarCanje() {
   sello.hidden = !fecha;
   if (fecha) sello.textContent = (navidad ? 'Recibido' : 'Canjeado') + ' · ' + fecha;
   $('t-canjear').hidden = !!fecha;
-  $('t-canjear').textContent = navidad ? '¡Regalo recibido!' : 'Canjear este plan';
+  $('t-canjear').textContent = navidad ? '¡Regalo recibido!' : 'Canjear este regalo';
   $('t-cerrar').textContent = fecha ? 'Cerrar' : 'Guardar para luego';
 }
 $('t-canjear').addEventListener('click', () => {
@@ -735,7 +735,7 @@ $('t-canjear').addEventListener('click', () => {
   pintarCanje();
   const r = $('tarjeta').getBoundingClientRect();
   confeti(r.left + r.width / 2, r.top + r.height / 2, 60, false); tocar('cascabel'); vibrar(30);
-  aviso(actual.dia === 25 ? '¡Feliz Navidad, Leti!' : 'Plan canjeado. ¡A disfrutarlo!');
+  aviso(actual.dia === 25 ? '¡Feliz Navidad, Leti!' : 'Regalo canjeado. ¡A disfrutarlo!');
 });
 function cerrar() { $('velo').hidden = true; $('t-audio').pause(); }
 $('t-cerrar').addEventListener('click', cerrar);

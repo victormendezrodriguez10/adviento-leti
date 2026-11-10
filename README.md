@@ -1,6 +1,6 @@
 # Adviento de Leti
 
-Calendario de adviento sorpresa en forma de web app: 31 puertas, una por cada día de diciembre. Cada puerta se desbloquea en su fecha a las 07:00 según el reloj del móvil (ajustable en `CONFIG.hora` de `index.html`) y, al abrirla, muestra un plan para los dos. El 25 es el regalo de Navidad y el 31, Nochevieja.
+Calendario de adviento sorpresa en forma de web app: 31 puertas, una por cada día de diciembre. Cada puerta se desbloquea en su fecha a las 07:00 según el reloj del móvil (ajustable en `CONFIG.hora` de `index.html`) y, al abrirla, muestra un regalo para ella. El 25 es el regalo de Navidad y el 31, Nochevieja.
 
 La página pide usuario y contraseña. Las sorpresas están cifradas en `sorpresas.enc.js` con una clave derivada del usuario y la contraseña (PBKDF2 + AES-GCM), así que ni la contraseña ni las sorpresas aparecen en este repositorio.
 
