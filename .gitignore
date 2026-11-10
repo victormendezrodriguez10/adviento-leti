@@ -1,2 +1,3 @@
-# Sorpresas en claro: solo en local. Al repo sube únicamente sorpresas.enc.js (cifrado).
+# Sorpresas en claro y archivos multimedia: solo en local. Al repo sube únicamente sorpresas.enc.js (cifrado).
 sorpresas.json
+media/
