@@ -286,6 +286,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .rec .rec-fotos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
 .rec .rec-fotos img:only-child{grid-column:1/-1;aspect-ratio:16/10}
 .rec .rec-nota{margin:0;font-family:var(--display);font-style:italic;font-size:1rem;color:var(--ink)}
+.rec .rec-nota small{font-family:var(--body);font-style:normal;font-size:.72rem;color:var(--ink-soft)}
 .rec .rec-canje{font-size:.72rem;color:var(--green);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0}
 .recuerdos .vacio{text-align:center;color:var(--ink-soft);padding:20px 0 26px;font-family:var(--display);font-style:italic}
 
@@ -304,6 +305,11 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .taller{text-align:center;margin-top:34px;font-size:clamp(1.6rem,7vw,2.2rem);line-height:1;letter-spacing:.15em;user-select:none}
 .pie{text-align:center;color:var(--muted);font-size:.86rem;margin:12px 0 0;font-family:var(--display);font-style:italic}
 .pie-botones{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+.pie-botones.copia{margin-top:10px}
+.pie-botones.copia .enlace{opacity:.8;font-weight:500}
+.nota-copia{font-size:.74rem;max-width:34ch;margin:8px auto 0;opacity:.75}
+.enlace.bloqueado{opacity:.6}
+.enlace-ink.guardar{background:var(--ink);color:var(--paper);border-color:var(--ink);margin-left:auto}
 
 @media(prefers-reduced-motion:reduce){
   .frente{transition:transform .2s}
@@ -371,6 +377,12 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
     <button type="button" class="enlace" id="btn-recuerdos">📖 Nuestro diciembre</button>
     <button type="button" class="enlace" id="btn-cerrar-sesion">Cerrar sesión</button>
   </p>
+  <p class="pie-botones copia">
+    <button type="button" class="enlace" id="btn-copia">💾 Guardar copia de seguridad</button>
+    <button type="button" class="enlace" id="btn-recuperar">↩️ Recuperar copia</button>
+    <input type="file" id="copia-archivo" accept=".json,application/json" hidden>
+  </p>
+  <p class="pie nota-copia">La copia guarda tus puertas abiertas, canjes, notas y fotos en un archivo, por si cambias de móvil.</p>
 </main>
 
 <div class="velo" id="velo" hidden role="dialog" aria-modal="true" aria-labelledby="t-titulo">
@@ -393,6 +405,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
         <input type="file" id="n-archivo" accept="image/*" hidden>
         <button type="button" class="enlace-ink" id="n-anadir">📷 Añadir una foto</button>
         <button type="button" class="enlace-ink" id="n-quitar" hidden>Quitar foto</button>
+        <button type="button" class="enlace-ink guardar" id="n-guardar">💾 Guardar</button>
       </div>
       <p class="nota-guardado" id="n-guardado"></p>
     </div>
@@ -457,8 +470,46 @@ let canjeadas = leer(KEY_CANJE, {});
 let notas = leer(KEY_NOTAS, {});
 let sonido = leer(KEY_SONIDO, false) === true;
 let notifActivas = leer(KEY_AVISOS, false) === true;
-function guardar() { escribir(KEY, [...abiertas]); escribir(KEY_CANJE, canjeadas); }
-function guardarNotas() { if (!escribir(KEY_NOTAS, notas)) { aviso('No queda espacio para guardar más fotos en este móvil'); return false; } return true; }
+let sonidos = null, preparando = null;   /* audios generados (ver sección Sonido) */
+
+/* Almacén duradero: todo se guarda a la vez en localStorage y en IndexedDB (más capacidad y más
+   resistente a limpiezas), y al arrancar se combinan los dos por si uno se hubiera perdido. */
+const idb = {
+  abrir() {
+    return new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error('sin indexedDB'));
+      const r = indexedDB.open('adviento-leti', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async get(k) {
+    try { const db = await this.abrir(); return await new Promise((res, rej) => { const t = db.transaction('kv').objectStore('kv').get(k); t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error); }); }
+    catch (e) { return undefined; }
+  },
+  async set(k, v) {
+    try { const db = await this.abrir(); return await new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => rej(t.error); }); }
+    catch (e) { return false; }
+  },
+};
+async function cargarAlmacen() {
+  const [a, c, n] = await Promise.all([idb.get(KEY), idb.get(KEY_CANJE), idb.get(KEY_NOTAS)]);
+  if (Array.isArray(a)) a.forEach((d) => abiertas.add(d));
+  if (c && typeof c === 'object') canjeadas = { ...c, ...canjeadas };
+  if (n && typeof n === 'object') notas = { ...n, ...notas };
+  guardar(); guardarNotas(true);
+}
+function guardar() {
+  escribir(KEY, [...abiertas]); escribir(KEY_CANJE, canjeadas);
+  idb.set(KEY, [...abiertas]); idb.set(KEY_CANJE, canjeadas);
+}
+function guardarNotas(silencioso) {
+  const enLocal = escribir(KEY_NOTAS, notas);
+  idb.set(KEY_NOTAS, notas).then((ok) => { if (!ok && !enLocal && !silencioso) aviso('No se ha podido guardar en este móvil. Prueba a liberar espacio.'); });
+  return true;
+}
+function pedirPersistencia() { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); } catch (e) {} }
 const vibrar = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
 
 /* ---------- Acceso y descifrado ---------- */
@@ -496,6 +547,8 @@ function entrar(sorpresas) {
   $('eyebrow').textContent = 'Diciembre ' + CONFIG.year + ' · ' + TOTAL + ' puertas';
   aplicarPreview();
   programarAviso();
+  pedirPersistencia();
+  pintarAlbum();
   window.scrollTo(0, 0);
   if (!leer(KEY_BIENVENIDA, false)) { $('velo-bienvenida').hidden = false; $('b-cerrar').focus(); }
 }
@@ -539,6 +592,7 @@ $('btn-cerrar-sesion').addEventListener('click', () => {
   if (sonido) prepararSonidos();
   if ('Notification' in window) { $('btn-avisos').hidden = false; pintarAvisos(); }
   if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
+  await cargarAlmacen();
   if (!subtle || !CIFRADO) return;
   const llave = await llaveRecordada();
   if (!llave) return;
@@ -746,27 +800,22 @@ document.addEventListener('keydown', (e) => {
   if (!$('velo-recuerdos').hidden) $('velo-recuerdos').hidden = true;
 });
 
-/* ---------- Notas de Leti (texto y foto por día, guardados en este móvil) ---------- */
-let notaTimer;
+/* ---------- Notas de Leti (texto y foto por día; se guardan al pulsar "Guardar") ---------- */
+let fotoPendiente = null;   /* foto elegida pero aún no guardada */
 function pintarNota() {
   const n = notas[actual.dia] || {};
+  fotoPendiente = null;
   $('n-texto').value = n.texto || '';
-  const img = $('n-foto');
-  img.hidden = !n.foto; if (n.foto) img.src = n.foto; else img.removeAttribute('src');
-  $('n-quitar').hidden = !n.foto;
-  $('n-anadir').textContent = n.foto ? '📷 Cambiar la foto' : '📷 Añadir una foto';
-  $('n-guardado').textContent = '';
+  pintarFotoNota(n.foto);
+  $('n-guardado').textContent = n.texto || n.foto ? (n.fecha ? 'Guardado el ' + n.fecha : 'Guardado ✓') : '';
 }
-$('n-texto').addEventListener('input', () => {
-  clearTimeout(notaTimer);
-  notaTimer = setTimeout(() => {
-    if (!actual) return;
-    const n = notas[actual.dia] || {};
-    n.texto = $('n-texto').value.trim();
-    if (!n.texto && !n.foto) delete notas[actual.dia]; else notas[actual.dia] = n;
-    if (guardarNotas()) $('n-guardado').textContent = 'Guardado ✓';
-  }, 500);
-});
+function pintarFotoNota(src) {
+  const img = $('n-foto');
+  img.hidden = !src; if (src) img.src = src; else img.removeAttribute('src');
+  $('n-quitar').hidden = !src;
+  $('n-anadir').textContent = src ? '📷 Cambiar la foto' : '📷 Añadir una foto';
+}
+$('n-texto').addEventListener('input', () => { $('n-guardado').textContent = 'Sin guardar. Pulsa Guardar cuando termines.'; });
 $('n-anadir').addEventListener('click', () => $('n-archivo').click());
 $('n-archivo').addEventListener('change', () => {
   const f = $('n-archivo').files && $('n-archivo').files[0];
@@ -779,11 +828,9 @@ $('n-archivo').addEventListener('change', () => {
       const c = document.createElement('canvas');
       c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      const n = notas[actual.dia] || {};
-      n.foto = c.toDataURL('image/jpeg', 0.72);
-      notas[actual.dia] = n;
-      if (guardarNotas()) { pintarNota(); $('n-guardado').textContent = 'Foto guardada ✓'; }
-      else delete n.foto;
+      fotoPendiente = c.toDataURL('image/jpeg', 0.72);
+      pintarFotoNota(fotoPendiente);
+      $('n-guardado').textContent = 'Foto lista. Pulsa Guardar para conservarla.';
     };
     img.src = lector.result;
   };
@@ -791,14 +838,71 @@ $('n-archivo').addEventListener('change', () => {
   $('n-archivo').value = '';
 });
 $('n-quitar').addEventListener('click', () => {
-  if (!actual || !notas[actual.dia]) return;
-  delete notas[actual.dia].foto;
-  if (!notas[actual.dia].texto) delete notas[actual.dia];
-  guardarNotas(); pintarNota();
+  fotoPendiente = '';   /* cadena vacía = quitar la foto al guardar */
+  pintarFotoNota(null);
+  $('n-guardado').textContent = 'Pulsa Guardar para confirmar.';
+});
+$('n-guardar').addEventListener('click', () => {
+  if (!actual) return;
+  const n = { ...(notas[actual.dia] || {}) };
+  n.texto = $('n-texto').value.trim();
+  if (fotoPendiente === '') delete n.foto; else if (fotoPendiente) n.foto = fotoPendiente;
+  const d = new Date();
+  n.fecha = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+  if (!n.texto && !n.foto) delete notas[actual.dia]; else notas[actual.dia] = n;
+  guardarNotas();
+  fotoPendiente = null;
+  $('n-guardado').textContent = (n.texto || n.foto) ? 'Guardado ✓' : 'Nota borrada';
+  aviso('Recuerdo guardado');
+  tocar('cascabel');
 });
 
-/* ---------- Rincón de recuerdos ---------- */
+/* ---------- Copia de seguridad (archivo con puertas, canjes, notas y fotos) ---------- */
+$('btn-copia').addEventListener('click', () => {
+  const datos = { app: 'adviento-leti', year: CONFIG.year, fecha: new Date().toISOString(), abiertas: [...abiertas], canjeadas, notas };
+  const texto = JSON.stringify(datos);
+  const nombre = 'adviento-leti-copia.json';
+  try {
+    const archivo = new File([texto], nombre, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+      navigator.share({ files: [archivo], title: 'Copia del calendario de Leti' }).catch(() => {});
+      return;
+    }
+  } catch (e) {}
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+  a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  aviso('Copia guardada en Descargas');
+});
+$('btn-recuperar').addEventListener('click', () => $('copia-archivo').click());
+$('copia-archivo').addEventListener('change', () => {
+  const f = $('copia-archivo').files && $('copia-archivo').files[0];
+  if (!f) return;
+  const lector = new FileReader();
+  lector.onload = () => {
+    try {
+      const d = JSON.parse(lector.result);
+      if (d.app !== 'adviento-leti') throw new Error('archivo no válido');
+      (d.abiertas || []).forEach((x) => abiertas.add(x));
+      canjeadas = { ...canjeadas, ...(d.canjeadas || {}) };
+      notas = { ...notas, ...(d.notas || {}) };
+      guardar(); guardarNotas(); render();
+      aviso('Copia recuperada: ' + abiertas.size + ' puertas, ' + Object.keys(notas).length + ' recuerdos');
+    } catch (e) { aviso('Ese archivo no es una copia del calendario'); }
+  };
+  lector.readAsText(f);
+  $('copia-archivo').value = '';
+});
+
+/* ---------- Rincón de recuerdos (se abre el 1 de enero) ---------- */
+const albumAbierto = () => preview || new Date() >= new Date(CONFIG.year + 1, 0, 1);
+function pintarAlbum() {
+  const b = $('btn-recuerdos');
+  b.classList.toggle('bloqueado', !albumAbierto());
+  b.textContent = albumAbierto() ? '📖 Nuestro diciembre' : '🔒 Nuestro diciembre · se abre el 1 de enero';
+}
 function abrirRecuerdos() {
+  if (!albumAbierto()) { aviso('El álbum de recuerdos se abre el 1 de enero, cuando termine el mes'); return; }
   const lista = $('r-lista');
   const dias = SORPRESAS.filter((s) => abiertas.has(s.dia));
   $('r-intro').textContent = dias.length ? dias.length + (dias.length === 1 ? ' día abierto' : ' días abiertos') + ' de ' + TOTAL : '';
@@ -811,7 +915,7 @@ function abrirRecuerdos() {
       return '<div class="rec">' +
         '<div class="rec-cab"><span class="rec-ico">' + escapar(s.icono) + '</span><div><p class="rec-dia">' + s.dia + ' de diciembre</p><h3>' + escapar(s.titulo) + '</h3></div></div>' +
         (fotos ? '<div class="rec-fotos">' + fotos + '</div>' : '') +
-        (n.texto ? '<p class="rec-nota">“' + escapar(n.texto) + '”</p>' : '') +
+        (n.texto ? '<p class="rec-nota">“' + escapar(n.texto) + '”' + (n.fecha ? ' <small>· ' + escapar(n.fecha) + '</small>' : '') + '</p>' : '') +
         (canjeadas[s.dia] ? '<p class="rec-canje">✓ ' + (s.dia === 25 ? 'Recibido' : 'Canjeado') + ' el ' + escapar(canjeadas[s.dia]) + '</p>' : '') +
       '</div>';
     }).join('');
@@ -829,6 +933,7 @@ function aplicarPreview() {
   document.body.classList.toggle('modo-prueba', preview);
   $('banner-prueba').hidden = !preview;
   render();
+  pintarAlbum();
 }
 let pulsando;
 const titulo = $('titulo');
@@ -850,7 +955,6 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && TO
 /* ---------- Sonido ----------
    Los sonidos se generan una vez (sin archivos) y se reproducen como audio normal,
    que en iPhone suena aunque el interruptor lateral esté en silencio. */
-let sonidos = null, preparando = null;
 function notaEn(c, freq, t, dur, vol, tipo) {
   const o = c.createOscillator(), g = c.createGain();
   o.type = tipo || 'sine'; o.frequency.value = freq;
