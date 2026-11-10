@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e2a21">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Adviento de Leti">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Calendario de adviento sorpresa para Leti: 31 puertas, una por cada día de diciembre.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Adviento de Leti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Karla:wght@400;500;700&display=swap">
+<style>
+/* Layout: guirnalda de luces arriba, trineo con renos, pared de puertas rojas, verdes y crema; el 25 es una puerta ancha con lazo y el 31 una puerta de medianoche */
+:root{
+  --bg:#0e2a21;
+  --bg-glow:#1d4d3c;
+  --paper:#f5e8d3;
+  --paper-deep:#e4cfab;
+  --ink:#2b1d13;
+  --ink-soft:#7a6650;
+  --gold:#d8a84a;
+  --gold-soft:#f1d28c;
+  --red:#b5323b;
+  --red-deep:#8e242c;
+  --green:#2f7a4c;
+  --green-deep:#1f5a36;
+  --night:#1b2a4d;
+  --night-deep:#0f1a33;
+  --cream:#f4ebdc;
+  --muted:#a7bfb3;
+  --display:'Fraunces',Georgia,'Times New Roman',serif;
+  --body:'Karla',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{
+  margin:0;min-height:100%;
+  background:var(--bg);
+  background-image:radial-gradient(ellipse 90% 45% at 50% -5%,var(--bg-glow),transparent 70%);
+  color:var(--cream);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 48px;
+  overflow-x:hidden;
+}
+#nieve{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+main,.login{position:relative;z-index:1;max-width:640px;margin:0 auto}
+
+/* Guirnalda de luces */
+.luces{display:flex;justify-content:space-between;margin:0 -4px;padding-top:6px;border-top:2px solid rgba(0,0,0,.45);list-style:none;padding-left:0;padding-right:0}
+.luces li{width:11px;height:16px;border-radius:50% 50% 55% 55%;position:relative;animation:parpadeo 2.2s ease-in-out infinite}
+.luces li::before{content:"";position:absolute;left:3px;top:-5px;width:5px;height:5px;background:#2a2a2a;border-radius:2px 2px 0 0}
+.luces li:nth-child(4n+1){background:#e2463f;box-shadow:0 0 12px #e2463f}
+.luces li:nth-child(4n+2){background:#f2c94c;box-shadow:0 0 12px #f2c94c;animation-delay:.5s}
+.luces li:nth-child(4n+3){background:#4bbf6b;box-shadow:0 0 12px #4bbf6b;animation-delay:1.1s}
+.luces li:nth-child(4n+4){background:#5aa9e6;box-shadow:0 0 12px #5aa9e6;animation-delay:1.6s}
+@keyframes parpadeo{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* Pantalla de acceso */
+.login{text-align:center;padding-block:0 30px}
+.login .cabecera{padding-bottom:18px}
+.login form{
+  background:var(--paper);color:var(--ink);border-radius:16px;padding:26px 22px 22px;
+  width:100%;max-width:380px;margin:0 auto;box-shadow:0 30px 60px rgba(0,0,0,.45);
+  display:grid;gap:14px;text-align:left;position:relative
+}
+.login form::before{content:"";position:absolute;inset:8px;border:1px dashed rgba(122,102,80,.5);border-radius:10px;pointer-events:none}
+.login label{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);display:grid;gap:6px}
+.login input[type=text],.login input[type=password]{
+  font:1rem var(--body);padding:12px 13px;border:1.5px solid rgba(122,102,80,.4);border-radius:8px;
+  background:#fff9ef;color:var(--ink);width:100%;letter-spacing:.03em;position:relative
+}
+.login input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.login .recordar{display:flex;gap:8px;align-items:center;font-size:.86rem;color:var(--ink-soft);font-weight:500;letter-spacing:0;text-transform:none}
+.recordar input{accent-color:var(--red);width:17px;height:17px;position:relative}
+.error{color:var(--red);font-size:.86rem;font-weight:700;margin:0;min-height:1.3em;text-align:center}
+.login .boton{width:100%;position:relative}
+.login .nota{font-size:.8rem;color:var(--muted);margin:16px auto 0;max-width:34ch}
+
+.prueba{
+  display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:center;
+  margin:12px auto 0;padding:8px 14px;border-radius:10px;
+  background:rgba(216,168,74,.14);border:1px dashed rgba(216,168,74,.6);
+  font-size:.82rem;color:var(--gold-soft)
+}
+.prueba button,.enlace{appearance:none;border:1px solid rgba(241,210,140,.6);background:none;color:var(--gold-soft);font:700 .78rem var(--body);padding:5px 10px;border-radius:999px;cursor:pointer}
+.prueba button:focus-visible,.puerta button:focus-visible,.boton:focus-visible,.enlace:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+
+.cabecera{text-align:center;padding-block:22px 22px;position:relative}
+.trineo{
+  font-size:clamp(1.7rem,8vw,2.6rem);line-height:1;letter-spacing:.08em;
+  margin:0 0 10px;animation:vuela 4s ease-in-out infinite;user-select:none
+}
+.trineo .luna{display:inline-block;width:.75em;height:.75em;border-radius:50%;background:var(--gold-soft);box-shadow:0 0 24px var(--gold-soft);vertical-align:.1em;margin-right:.3em}
+@keyframes vuela{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(6px,-6px) rotate(-2deg)}}
+.eyebrow{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:0}
+h1{
+  font-family:var(--display);font-weight:400;font-style:italic;
+  font-size:clamp(2.1rem,7.5vw,3rem);line-height:1.08;margin:.3em 0 .45em;
+  text-wrap:balance;color:var(--cream);
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
+.sub{color:var(--muted);margin:0 auto;max-width:38ch;text-wrap:balance}
+.estado{
+  margin:20px auto 0;display:inline-flex;gap:8px;align-items:center;
+  padding:8px 16px 8px 12px;border:1px solid rgba(216,168,74,.45);border-radius:999px;
+  font-size:.86rem;color:var(--gold-soft);font-variant-numeric:tabular-nums;max-width:100%
+}
+.estado .elfo{font-size:1.15rem;line-height:1}
+
+.puertas{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;list-style:none;margin:0;padding:0}
+.puerta{position:relative;aspect-ratio:1/1.15;perspective:700px;max-width:100%;min-width:0}
+.puerta.grande{grid-column:1/-1;aspect-ratio:auto;height:150px}
+.puerta.ancha{grid-column:span 2;aspect-ratio:auto;height:auto;min-height:96px}
+@media(min-width:560px){
+  .puertas{grid-template-columns:repeat(6,1fr);gap:14px}
+  .puerta.ancha{grid-column:span 1;aspect-ratio:1/1.15}
+}
+.puerta button{
+  appearance:none;border:0;background:none;padding:0;margin:0;
+  width:100%;height:100%;position:relative;cursor:pointer;
+  font:inherit;color:inherit;transform-style:preserve-3d;border-radius:9px;
+  -webkit-tap-highlight-color:transparent
+}
+.dentro{
+  position:absolute;inset:0;border-radius:9px;
+  background:var(--paper-deep);color:var(--ink);
+  box-shadow:inset 0 2px 14px rgba(60,35,10,.35);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  padding:6px;text-align:center;overflow:hidden
+}
+.dentro .ico{font-size:clamp(1.5rem,6vw,2rem);line-height:1}
+.dentro .mini{font-size:.66rem;line-height:1.2;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;overflow-wrap:anywhere}
+.grande .dentro{flex-direction:row;gap:14px}
+.grande .dentro .ico{font-size:2.6rem}
+.grande .dentro .mini{font-size:.9rem;text-align:left}
+
+/* Cada puerta es un regalo envuelto: caja de color con cinta cruzada */
+.puerta{--caja1:#c93d47;--caja2:#8e242c;--cinta:#f1d28c;--cinta2:#d8a84a;--ancho:6px}
+.puerta.rojo{--caja1:#c93d47;--caja2:#8e242c;--cinta:#f6e9d2;--cinta2:#e4cfab}
+.puerta.verde{--caja1:#3a8a58;--caja2:#1f5a36;--cinta:#f1d28c;--cinta2:#d8a84a}
+.puerta.azul{--caja1:#3b6fc0;--caja2:#1f3f7a;--cinta:#f6e9d2;--cinta2:#e4cfab}
+.puerta.dorado{--caja1:#e0b35a;--caja2:#b5862e;--cinta:#c93d47;--cinta2:#8e242c}
+.puerta.rosa{--caja1:#e07a9a;--caja2:#b14a6c;--cinta:#f6e9d2;--cinta2:#e4cfab}
+.puerta.morado{--caja1:#7a56b5;--caja2:#4b3278;--cinta:#f1d28c;--cinta2:#d8a84a}
+.puerta.crema{--caja1:#f5e8d3;--caja2:#e4cfab;--cinta:#c93d47;--cinta2:#8e242c}
+.puerta.nochevieja{--caja1:#2a3f6e;--caja2:#0f1a33;--cinta:#f1d28c;--cinta2:#d8a84a}
+.frente{
+  position:absolute;inset:0;border-radius:9px;
+  background:
+    linear-gradient(90deg,transparent calc(50% - var(--ancho)),var(--cinta2) calc(50% - var(--ancho)),var(--cinta) calc(50% - var(--ancho) + 1.5px),var(--cinta) calc(50% + var(--ancho) - 1.5px),var(--cinta2) calc(50% + var(--ancho)),transparent calc(50% + var(--ancho))),
+    linear-gradient(180deg,transparent calc(50% - var(--ancho)),var(--cinta2) calc(50% - var(--ancho)),var(--cinta) calc(50% - var(--ancho) + 1.5px),var(--cinta) calc(50% + var(--ancho) - 1.5px),var(--cinta2) calc(50% + var(--ancho)),transparent calc(50% + var(--ancho))),
+    linear-gradient(160deg,rgba(255,255,255,.28),rgba(255,255,255,0) 50%),
+    linear-gradient(135deg,var(--caja1),var(--caja2));
+  color:var(--ink);
+  box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 6px 14px rgba(0,0,0,.35);
+  transform-origin:left center;
+  transition:transform .9s cubic-bezier(.25,.8,.25,1),filter .4s,box-shadow .4s;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.grande .frente::before{content:"";position:absolute;inset:5px;border:1px dashed rgba(255,235,200,.45);border-radius:6px;pointer-events:none}
+.num{font-family:var(--display);font-weight:600;font-size:clamp(1.25rem,5.5vw,1.8rem);line-height:1;font-variant-numeric:tabular-nums}
+.motivo{position:absolute;left:7px;top:6px;font-size:1.2rem;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.candado{position:absolute;right:8px;bottom:7px;width:11px;height:11px;opacity:.7;color:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.crema .candado,.dorado .candado{color:var(--ink);filter:none}
+.puerta:not(.grande) .tag{padding:4px 10px 3px;border-radius:6px;transform:rotate(-4deg)}
+.puerta:not(.grande) .tag::before{left:5px;width:5px;height:5px}
+.puerta:not(.grande) .tag .etiqueta{font-size:.52rem;letter-spacing:.16em}
+.nochevieja .tag .etiqueta{color:var(--night)}
+.ancha .tag{padding:4px 14px 3px}
+
+.puerta.cerrada .frente{filter:saturate(.55) brightness(.7)}
+.puerta.lista .frente{box-shadow:0 0 0 1.5px var(--gold),0 0 20px rgba(216,168,74,.45),0 6px 14px rgba(0,0,0,.35);animation:latido 2.4s ease-in-out infinite}
+.puerta.abierta .frente{transform:rotateY(-108deg)}
+.puerta.abierta .dentro{animation:brilla .9s ease-out}
+.puerta.tiembla{animation:tiembla .45s}
+
+.grande .frente{
+  background:
+    linear-gradient(90deg,transparent calc(50% - 9px),var(--gold) calc(50% - 9px),var(--gold-soft) 50%,var(--gold) calc(50% + 9px),transparent calc(50% + 9px)),
+    linear-gradient(180deg,transparent calc(50% - 9px),var(--gold) calc(50% - 9px),var(--gold-soft) 50%,var(--gold) calc(50% + 9px),transparent calc(50% + 9px)),
+    linear-gradient(135deg,#c93d47,var(--red-deep));
+  color:var(--cream);flex-direction:column;gap:2px
+}
+.grande .num{font-size:2.4rem}
+.tag{
+  background:var(--paper);color:var(--ink);padding:8px 22px 7px;border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;transform:rotate(-3deg);
+  box-shadow:0 6px 14px rgba(0,0,0,.35);position:relative
+}
+.tag::before{content:"";position:absolute;left:8px;top:50%;width:7px;height:7px;border-radius:50%;background:var(--red-deep);transform:translateY(-50%);opacity:.7}
+.tag .etiqueta{color:var(--red)}
+.grande .motivo{font-size:1.4rem;left:12px;top:10px}
+.grande .motivo.der{left:auto;right:12px}
+.etiqueta{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--gold-soft)}
+
+@keyframes latido{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes tiembla{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes brilla{0%{box-shadow:inset 0 0 0 rgba(241,210,140,0)}40%{box-shadow:inset 0 0 40px rgba(241,210,140,.9)}100%{box-shadow:inset 0 2px 14px rgba(60,35,10,.35)}}
+@keyframes aparece{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+
+.velo{
+  position:fixed;inset:0;z-index:20;
+  background:rgba(4,16,12,.74);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-left,0px));
+}
+.tarjeta{
+  background:var(--paper);color:var(--ink);border-radius:16px;
+  padding:30px 24px 26px;max-width:420px;width:100%;text-align:center;
+  box-shadow:0 30px 60px rgba(0,0,0,.5);animation:aparece .35s ease-out;
+  position:relative;overflow:hidden
+}
+.tarjeta::before{content:"";position:absolute;inset:8px;border:1px dashed rgba(122,102,80,.5);border-radius:10px;pointer-events:none}
+.tarjeta .dia{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin:0}
+.tarjeta .icono{font-size:3.4rem;line-height:1;margin:16px 0 12px}
+.tarjeta h2{font-family:var(--display);font-weight:600;font-size:1.75rem;margin:0 0 10px;line-height:1.15;text-wrap:balance}
+.tarjeta p.texto{margin:0 auto 18px;max-width:38ch}
+.tarjeta .firma{font-family:var(--display);font-style:italic;color:var(--ink-soft);margin:0 0 20px}
+.sello{
+  display:inline-block;margin:0 0 18px;padding:4px 10px;border:2px solid var(--red);color:var(--red);
+  border-radius:6px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  transform:rotate(-3deg);opacity:.85
+}
+.tarjeta.navidad{background:linear-gradient(165deg,#fff5e3,#f1d9b0)}
+.tarjeta.navidad .dia{color:var(--red)}
+.boton{appearance:none;border:0;background:var(--ink);color:var(--paper);font:700 .95rem var(--body);padding:12px 26px;border-radius:999px;cursor:pointer;display:block;margin:0 auto}
+.boton[disabled]{opacity:.6;cursor:wait}
+.tarjeta.navidad .boton{background:var(--red)}
+
+.aviso{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;pointer-events:none;
+  display:flex;justify-content:center;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+}
+.aviso span{
+  background:var(--paper);color:var(--ink);padding:10px 18px;border-radius:999px;
+  font-size:.9rem;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s;text-align:center
+}
+.aviso.visible span{opacity:1;transform:none}
+
+.taller{text-align:center;margin-top:34px;font-size:clamp(1.6rem,7vw,2.2rem);line-height:1;letter-spacing:.15em;user-select:none}
+.pie{text-align:center;color:var(--muted);font-size:.86rem;margin:12px 0 0;font-family:var(--display);font-style:italic}
+.salir{text-align:center;margin-top:18px}
+
+@media(prefers-reduced-motion:reduce){
+  .frente{transition:transform .2s}
+  .puerta.lista .frente,.puerta.tiembla,.puerta.abierta .dentro,.tarjeta,.trineo,.luces li{animation:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="nieve" aria-hidden="true"></canvas>
+
+<section class="login" id="login">
+  <ul class="luces" aria-hidden="true"></ul>
+  <header class="cabecera">
+    <p class="trineo" aria-hidden="true"><span class="luna"></span>🦌🦌🦌🛷🎅</p>
+    <p class="eyebrow">Diciembre 2026</p>
+    <h1>El calendario de adviento de <b>Leti</b></h1>
+    <p class="sub">Los elfos solo abren la puerta a quien conoce la contraseña.</p>
+  </header>
+  <form id="form-login" autocomplete="off">
+    <label for="usuario">Usuario
+      <input type="text" id="usuario" name="usuario" autocapitalize="characters" autocorrect="off" spellcheck="false" required>
+    </label>
+    <label for="clave">Contraseña
+      <input type="password" id="clave" name="clave" required>
+    </label>
+    <label class="recordar" for="recordar"><input type="checkbox" id="recordar" checked> Recordarme en este móvil</label>
+    <p class="error" id="error-login" aria-live="polite"></p>
+    <button type="submit" class="boton" id="btn-entrar">Entrar</button>
+  </form>
+  <p class="nota">Si no te acuerdas de la contraseña, pregúntale a quien te regaló este calendario.</p>
+</section>
+
+<main id="app" hidden>
+  <ul class="luces" aria-hidden="true"></ul>
+
+  <div class="prueba" id="banner-prueba" hidden>
+    <span>Modo prueba: todas las puertas están desbloqueadas.</span>
+    <button type="button" id="btn-reiniciar">Cerrar todas las puertas</button>
+    <button type="button" id="btn-salir">Salir del modo prueba</button>
+  </div>
+
+  <header class="cabecera">
+    <p class="trineo" aria-hidden="true"><span class="luna"></span>🦌🦌🦌🛷🎅</p>
+    <p class="eyebrow" id="eyebrow">Diciembre 2026 · 31 puertas</p>
+    <h1 id="titulo">El calendario de adviento de <b>Leti</b></h1>
+    <p class="sub">Los elfos han preparado una puerta para cada día de diciembre. Detrás de cada una, un plan solo para nosotros dos.</p>
+    <div class="estado" id="estado" aria-live="polite"><span class="elfo" aria-hidden="true">🧝</span><span id="estado-texto">Cargando…</span></div>
+  </header>
+
+  <ol class="puertas" id="puertas" aria-label="Puertas del calendario"></ol>
+
+  <p class="taller" aria-hidden="true">🧝‍♀️🎄⛄🎄🧝</p>
+  <p class="pie">Hecho con cariño en el taller de Papá Noel, puerta a puerta.</p>
+  <p class="salir"><button type="button" class="enlace" id="btn-cerrar-sesion">Cerrar sesión</button></p>
+</main>
+
+<div class="velo" id="velo" hidden role="dialog" aria-modal="true" aria-labelledby="t-titulo">
+  <div class="tarjeta" id="tarjeta">
+    <p class="dia" id="t-dia"></p>
+    <div class="icono" id="t-icono"></div>
+    <h2 id="t-titulo"></h2>
+    <p class="texto" id="t-texto"></p>
+    <p class="firma" id="t-firma"></p>
+    <span class="sello">Aprobado por Papá Noel</span>
+    <button type="button" class="boton" id="t-cerrar">Guardar esta sorpresa</button>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" aria-live="polite"><span id="aviso-texto"></span></div>
+
+<script src="sorpresas.enc.js"></script>
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   Las sorpresas viven cifradas en sorpresas.enc.js (ver README).
+   ========================================================= */
+const CONFIG = {
+  year: 2026,
+  hora: 7,                       // hora a la que se abre cada puerta (07:00)
+  firma: 'Con todo mi cariño',
+};
+const HORA_TXT = String(CONFIG.hora).padStart(2, '0') + ':00';
+
+const $ = (id) => document.getElementById(id);
+const KEY = 'adviento-abiertas-' + CONFIG.year;
+const KEY_LLAVE = 'adviento-llave';
+let SORPRESAS = [];
+let TOTAL = 0;
+let preview = location.hash === '#prueba';
+let abiertas = new Set();
+try { abiertas = new Set(JSON.parse(localStorage.getItem(KEY) || '[]')); } catch (e) {}
+function guardar() { try { localStorage.setItem(KEY, JSON.stringify([...abiertas])); } catch (e) {} }
+
+/* ---------- Acceso y descifrado ---------- */
+const CIFRADO = window.SORPRESAS_CIFRADAS;
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const subtle = (window.crypto && window.crypto.subtle) || null;
+
+async function derivarLlave(usuario, clave) {
+  const material = await subtle.importKey('raw', new TextEncoder().encode(usuario + '\n' + clave), 'PBKDF2', false, ['deriveKey']);
+  return subtle.deriveKey(
+    { name: 'PBKDF2', salt: b64(CIFRADO.salt), iterations: CIFRADO.iteraciones, hash: 'SHA-256' },
+    material, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+}
+async function descifrar(llave) {
+  const buf = await subtle.decrypt({ name: 'AES-GCM', iv: b64(CIFRADO.iv) }, llave, b64(CIFRADO.datos));
+  return JSON.parse(new TextDecoder().decode(buf));
+}
+async function recordarLlave(llave) {
+  try { localStorage.setItem(KEY_LLAVE, JSON.stringify(await subtle.exportKey('jwk', llave))); } catch (e) {}
+}
+async function llaveRecordada() {
+  try {
+    const jwk = JSON.parse(localStorage.getItem(KEY_LLAVE) || 'null');
+    if (!jwk) return null;
+    return await subtle.importKey('jwk', jwk, { name: 'AES-GCM' }, true, ['decrypt']);
+  } catch (e) { return null; }
+}
+function olvidarLlave() { try { localStorage.removeItem(KEY_LLAVE); } catch (e) {} }
+
+function entrar(sorpresas) {
+  SORPRESAS = sorpresas.slice().sort((a, b) => a.dia - b.dia);
+  TOTAL = SORPRESAS.length;
+  $('login').hidden = true;
+  $('app').hidden = false;
+  $('eyebrow').textContent = 'Diciembre ' + CONFIG.year + ' · ' + TOTAL + ' puertas';
+  aplicarPreview();
+  window.scrollTo(0, 0);
+}
+
+$('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const error = $('error-login'), btn = $('btn-entrar');
+  error.textContent = '';
+  if (!subtle || !CIFRADO) { error.textContent = 'Este navegador no puede abrir el calendario. Prueba con Chrome o Safari actualizados.'; return; }
+  const usuario = $('usuario').value.trim().toUpperCase();
+  const clave = $('clave').value;
+  btn.disabled = true; btn.textContent = 'Comprobando…';
+  try {
+    const llave = await derivarLlave(usuario, clave);
+    const datos = await descifrar(llave);
+    if ($('recordar').checked) await recordarLlave(llave); else olvidarLlave();
+    $('clave').value = '';
+    entrar(datos);
+  } catch (err) {
+    error.textContent = 'Usuario o contraseña incorrectos. Los elfos no te dejan pasar.';
+    $('clave').value = ''; $('clave').focus();
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+});
+
+$('btn-cerrar-sesion').addEventListener('click', () => {
+  olvidarLlave();
+  SORPRESAS = []; TOTAL = 0;
+  $('puertas').innerHTML = '';
+  $('app').hidden = true;
+  $('login').hidden = false;
+  $('usuario').value = ''; $('clave').value = '';
+  window.scrollTo(0, 0);
+});
+
+(async function arranque() {
+  document.querySelectorAll('.luces').forEach((ul) => { ul.innerHTML = '<li></li>'.repeat(Math.max(12, Math.min(24, Math.floor(innerWidth / 30)))); });
+  if (!subtle || !CIFRADO) return;
+  const llave = await llaveRecordada();
+  if (!llave) return;
+  try { entrar(await descifrar(llave)); } catch (e) { olvidarLlave(); }
+})();
+
+/* ---------- Calendario ---------- */
+const hoyMedianoche = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
+const fechaDe = (dia) => new Date(CONFIG.year, 11, dia);
+const aperturaDe = (dia) => new Date(CONFIG.year, 11, dia, CONFIG.hora, 0, 0);
+const disponible = (dia) => preview || new Date() >= aperturaDe(dia);
+
+const CANDADO = '<svg class="candado" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="5" width="8" height="6" rx="1.2" fill="currentColor"/><path d="M4 5V3.5a2 2 0 0 1 4 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>';
+const COLORES = ['rojo', 'verde', 'azul', 'dorado', 'rosa', 'morado', 'crema'];
+const MOTIVOS = ['🎄', '🦌', '⛄', '🎅', '🧝', '🔔', '🍬', '⭐', '🎁', '❄️', '🧦', '🍪', '🤶', '🕯️', '🦌', '🧝‍♀️'];
+
+function escapar(t) { return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function rellenar(li, s) {
+  li.querySelector('.dentro').innerHTML = '<span class="ico">' + escapar(s.icono) + '</span><span class="mini">' + escapar(s.titulo) + '</span>';
+}
+
+function render() {
+  const ol = $('puertas');
+  ol.innerHTML = '';
+  SORPRESAS.forEach((s, i) => {
+    const li = document.createElement('li');
+    const esNavidad = s.dia === 25, esNochevieja = s.dia === 31;
+    li.className = 'puerta ' + (esNavidad ? 'grande' : esNochevieja ? 'nochevieja ancha' : s.dia === 30 ? 'ancha ' + COLORES[i % COLORES.length] : COLORES[i % COLORES.length]);
+    const ok = disponible(s.dia);
+    const ya = ok && abiertas.has(s.dia);
+    li.classList.add(ya ? 'abierta' : ok ? 'lista' : 'cerrada');
+    const motivo = esNavidad ? '<span class="motivo" aria-hidden="true">🎅</span><span class="motivo der" aria-hidden="true">🦌</span>'
+                 : '<span class="motivo" aria-hidden="true">' + (esNochevieja ? '🎆' : MOTIVOS[i % MOTIVOS.length]) + '</span>';
+    li.innerHTML =
+      '<button type="button" aria-label="Puerta ' + s.dia + (ok ? '' : ', se abre el ' + s.dia + ' de diciembre') + '">' +
+        '<div class="dentro"></div>' +
+        '<div class="frente">' + motivo +
+          '<span class="tag"><span class="num">' + s.dia + '</span>' +
+            (esNavidad ? '<span class="etiqueta">Navidad</span>' : esNochevieja ? '<span class="etiqueta">Nochevieja</span>' : '') +
+          '</span>' +
+          (ok ? '' : CANDADO) +
+        '</div>' +
+      '</button>';
+    if (ya) rellenar(li, s);
+    li.querySelector('button').addEventListener('click', () => alPulsar(s, li));
+    ol.appendChild(li);
+  });
+  actualizarEstado();
+}
+
+function actualizarEstado() {
+  const t0 = hoyMedianoche();
+  const inicio = fechaDe(1), fin = fechaDe(TOTAL);
+  const porAbrir = SORPRESAS.filter((s) => disponible(s.dia) && !abiertas.has(s.dia)).length;
+  let txt;
+  if (preview) {
+    txt = abiertas.size + ' de ' + TOTAL + ' puertas abiertas';
+  } else if (t0 < inicio) {
+    const dias = Math.round((inicio - t0) / 864e5);
+    txt = dias === 1 ? 'Mañana se abre la primera puerta' : 'Faltan ' + dias + ' días para la primera puerta';
+  } else if (porAbrir > 1) {
+    txt = 'Tienes ' + porAbrir + ' puertas por abrir';
+  } else if (porAbrir === 1) {
+    const d = SORPRESAS.find((s) => disponible(s.dia) && !abiertas.has(s.dia)).dia;
+    txt = 'Hoy puedes abrir la puerta ' + d;
+  } else if (t0 >= fin && disponible(TOTAL)) {
+    txt = 'Feliz año nuevo. Las ' + TOTAL + ' puertas están abiertas';
+  } else {
+    const hoy = Math.min(t0.getDate(), TOTAL);
+    txt = disponible(hoy) ? 'Puerta ' + hoy + ' abierta. La siguiente, mañana a las ' + HORA_TXT
+                          : 'La puerta ' + hoy + ' se abre hoy a las ' + HORA_TXT;
+  }
+  $('estado-texto').textContent = txt;
+}
+
+let avisoTimer;
+function aviso(msg) {
+  $('aviso-texto').textContent = msg;
+  $('aviso').classList.add('visible');
+  clearTimeout(avisoTimer);
+  avisoTimer = setTimeout(() => $('aviso').classList.remove('visible'), 2800);
+}
+
+function alPulsar(s, li) {
+  if (!disponible(s.dia)) {
+    li.classList.remove('tiembla'); void li.offsetWidth; li.classList.add('tiembla');
+    const dias = Math.round((fechaDe(s.dia) - hoyMedianoche()) / 864e5);
+    aviso(dias <= 0 ? 'Esta puerta se abre hoy a las ' + HORA_TXT + '. ¡Ya queda poco!'
+        : dias === 1 ? 'Los elfos la terminan mañana a las ' + HORA_TXT + '. ¡Paciencia!'
+        : 'Los elfos aún no han terminado esta puerta. Se abre el ' + s.dia + ' de diciembre a las ' + HORA_TXT);
+    return;
+  }
+  if (!abiertas.has(s.dia)) {
+    abiertas.add(s.dia); guardar();
+    rellenar(li, s);
+    li.classList.remove('lista'); li.classList.add('abierta');
+    actualizarEstado();
+    setTimeout(() => mostrar(s), 700);
+  } else {
+    mostrar(s);
+  }
+}
+
+function mostrar(s) {
+  const navidad = s.dia === 25;
+  $('tarjeta').classList.toggle('navidad', navidad);
+  $('t-dia').textContent = navidad ? '25 de diciembre · Navidad' : s.dia === 31 ? '31 de diciembre · Nochevieja' : 'Puerta ' + s.dia + ' · ' + s.dia + ' de diciembre';
+  $('t-icono').textContent = s.icono;
+  $('t-titulo').textContent = s.titulo;
+  $('t-texto').textContent = s.texto;
+  $('t-firma').textContent = CONFIG.firma;
+  $('t-cerrar').textContent = navidad ? '¡Feliz Navidad!' : 'Guardar esta sorpresa';
+  $('velo').hidden = false;
+  $('t-cerrar').focus();
+}
+function cerrar() { $('velo').hidden = true; }
+$('t-cerrar').addEventListener('click', cerrar);
+$('velo').addEventListener('click', (e) => { if (e.target === $('velo')) cerrar(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('velo').hidden) cerrar(); });
+
+/* Modo prueba: mantener pulsado el título 1,2 s, o abrir el enlace con #prueba */
+function aplicarPreview() {
+  document.body.classList.toggle('modo-prueba', preview);
+  $('banner-prueba').hidden = !preview;
+  render();
+}
+let pulsando;
+const titulo = $('titulo');
+const empezar = () => { clearTimeout(pulsando); pulsando = setTimeout(() => { preview = !preview; aplicarPreview(); aviso(preview ? 'Modo prueba activado' : 'Modo prueba desactivado'); }, 1200); };
+const cancelar = () => clearTimeout(pulsando);
+titulo.addEventListener('pointerdown', empezar);
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => titulo.addEventListener(ev, cancelar));
+titulo.addEventListener('contextmenu', (e) => e.preventDefault());
+$('btn-salir').addEventListener('click', () => { preview = false; aplicarPreview(); });
+$('btn-reiniciar').addEventListener('click', () => { abiertas.clear(); guardar(); render(); aviso('Todas las puertas vuelven a estar cerradas'); });
+
+/* Nieve */
+(function nieve() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = $('nieve'), ctx = c.getContext('2d');
+  let w, h, copos = [];
+  function medir() {
+    w = c.width = innerWidth * devicePixelRatio; h = c.height = innerHeight * devicePixelRatio;
+    const n = Math.min(90, Math.round(innerWidth / 6));
+    copos = Array.from({ length: n }, () => nuevo(true));
+  }
+  function nuevo(inicial) {
+    return { x: Math.random() * w, y: inicial ? Math.random() * h : -10, r: (Math.random() * 1.8 + .8) * devicePixelRatio, v: (Math.random() * .5 + .3) * devicePixelRatio, o: Math.random() * .45 + .25, d: Math.random() * Math.PI * 2 };
+  }
+  function paso() {
+    if (document.hidden) { requestAnimationFrame(paso); return; }
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#f4ebdc';
+    copos.forEach((p) => {
+      p.y += p.v; p.d += .01; p.x += Math.sin(p.d) * .3 * devicePixelRatio;
+      if (p.y > h + 10) Object.assign(p, nuevo(false));
+      ctx.globalAlpha = p.o; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(paso);
+  }
+  addEventListener('resize', medir);
+  medir(); paso();
+})();
+</script>
+</body>
+</html>
