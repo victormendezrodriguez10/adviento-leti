@@ -10,14 +10,14 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Calendario de adviento sorpresa para Leti: 31 puertas, una por cada día de diciembre.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <title>Adviento de Leti</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Karla:wght@400;500;700&display=swap">
 <style>
-/* Layout: guirnalda de luces arriba, trineo con renos, pared de regalos envueltos; el 25 es un regalo ancho con lazo y el 31 un regalo de medianoche */
+/* Layout: guirnalda de luces arriba, trineo con renos, pared de regalos envueltos; el 24 y el 25 son regalos anchos y el 31 un regalo de medianoche */
 :root{
   --bg:#0e2a21;
   --bg-glow:#1d4d3c;
@@ -96,7 +96,7 @@ main,.login{position:relative;z-index:1;max-width:640px;margin:0 auto}
 }
 .prueba button,.enlace{appearance:none;border:1px solid rgba(241,210,140,.6);background:none;color:var(--gold-soft);font:700 .78rem var(--body);padding:6px 11px;border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .enlace[aria-pressed="true"]{background:rgba(216,168,74,.22);border-color:var(--gold)}
-.prueba button:focus-visible,.puerta button:focus-visible,.boton:focus-visible,.enlace:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+.prueba button:focus-visible,.puerta button:focus-visible,.boton:focus-visible,.enlace:focus-visible,.enlace-ink:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
 .ajustes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
 
 .cabecera{text-align:center;padding-block:22px 22px;position:relative}
@@ -127,10 +127,11 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .puertas{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;list-style:none;margin:0;padding:0}
 .puerta{position:relative;aspect-ratio:1/1.15;perspective:700px;max-width:100%;min-width:0}
 .puerta.grande{grid-column:1/-1;aspect-ratio:auto;height:150px}
-.puerta.ancha{grid-column:span 2;aspect-ratio:auto;height:auto;min-height:96px}
+.puerta.grande.nochebuena{height:118px}
+.puerta.ancha,.puerta.ancha-movil{grid-column:span 2;aspect-ratio:auto;height:auto;min-height:96px}
 @media(min-width:560px){
   .puertas{grid-template-columns:repeat(6,1fr);gap:14px}
-  .puerta.ancha{grid-column:span 1;aspect-ratio:1/1.15}
+  .puerta.ancha-movil{grid-column:span 1;aspect-ratio:1/1.15}
 }
 .puerta button{
   appearance:none;border:0;background:none;padding:0;margin:0;
@@ -162,6 +163,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .puerta.morado{--caja1:#7a56b5;--caja2:#4b3278;--cinta:#f1d28c;--cinta2:#d8a84a}
 .puerta.crema{--caja1:#f5e8d3;--caja2:#e4cfab;--cinta:#c93d47;--cinta2:#8e242c}
 .puerta.nochevieja{--caja1:#2a3f6e;--caja2:#0f1a33;--cinta:#f1d28c;--cinta2:#d8a84a}
+.puerta.nochebuena{--caja1:#3a8a58;--caja2:#1f5a36;--cinta:#c93d47;--cinta2:#8e242c;--ancho:9px}
 .frente{
   position:absolute;inset:0;border-radius:9px;
   background:
@@ -185,7 +187,8 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .puerta:not(.grande) .tag::before{left:5px;width:5px;height:5px}
 .puerta:not(.grande) .tag .etiqueta{font-size:.52rem;letter-spacing:.16em}
 .nochevieja .tag .etiqueta{color:var(--night)}
-.ancha .tag{padding:4px 14px 3px}
+.nochebuena .tag .etiqueta{color:var(--green-deep)}
+.ancha .tag,.ancha-movil .tag{padding:4px 14px 3px}
 
 .puerta.cerrada .frente{filter:saturate(.55) brightness(.7)}
 .puerta.lista .frente{box-shadow:0 0 0 1.5px var(--gold),0 0 20px rgba(216,168,74,.45),0 6px 14px rgba(0,0,0,.35);animation:latido 2.4s ease-in-out infinite}
@@ -193,14 +196,16 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .puerta.abierta .dentro{animation:brilla .9s ease-out}
 .puerta.tiembla{animation:tiembla .45s}
 
-.grande .frente{
+.grande:not(.nochebuena) .frente{
   background:
     linear-gradient(90deg,transparent calc(50% - 9px),var(--gold) calc(50% - 9px),var(--gold-soft) 50%,var(--gold) calc(50% + 9px),transparent calc(50% + 9px)),
     linear-gradient(180deg,transparent calc(50% - 9px),var(--gold) calc(50% - 9px),var(--gold-soft) 50%,var(--gold) calc(50% + 9px),transparent calc(50% + 9px)),
     linear-gradient(135deg,#c93d47,var(--red-deep));
-  color:var(--cream);flex-direction:column;gap:2px
 }
+.grande .frente{color:var(--cream);flex-direction:column;gap:2px}
 .grande .num{font-size:2.4rem}
+.grande.nochebuena .num{font-size:2rem}
+.grande.nochebuena .tag{padding:6px 18px 5px}
 .tag{
   background:var(--paper);color:var(--ink);padding:8px 22px 7px;border-radius:8px;
   display:flex;flex-direction:column;align-items:center;gap:2px;transform:rotate(-3deg);
@@ -245,7 +250,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .canjeado{
   position:absolute;right:14px;top:64px;border:3px solid var(--green);color:var(--green);
   padding:5px 10px;border-radius:6px;font:700 .7rem/1.25 var(--body);letter-spacing:.14em;text-transform:uppercase;
-  transform:rotate(12deg);opacity:.9;text-align:center;background:rgba(255,255,255,.5)
+  transform:rotate(12deg);opacity:.9;text-align:center;background:rgba(255,255,255,.5);z-index:1
 }
 .pista{font-size:.84rem;color:var(--ink-soft);margin:0 0 18px;padding-top:12px;border-top:1px dashed rgba(122,102,80,.4)}
 .pista b{color:var(--ink)}
@@ -257,8 +262,35 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 .boton[disabled]{opacity:.6;cursor:wait}
 .tarjeta.navidad .boton:not(.secundario){background:var(--red)}
 
+/* Nota de Leti dentro de la tarjeta */
+.nota-leti{text-align:left;margin:0 0 18px;padding:14px 12px 12px;border:1px dashed rgba(122,102,80,.45);border-radius:10px;background:rgba(255,249,239,.6)}
+.nota-leti .nota-titulo{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);margin:0 0 8px}
+.nota-leti textarea{width:100%;font:.95rem/1.45 var(--body);color:var(--ink);background:#fff9ef;border:1.5px solid rgba(122,102,80,.35);border-radius:8px;padding:10px 12px;resize:vertical;min-height:64px}
+.nota-leti textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+.nota-foto{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+.nota-foto img{width:100%;max-height:220px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.enlace-ink{appearance:none;border:1.5px solid rgba(43,29,19,.3);background:none;color:var(--ink);font:700 .78rem var(--body);padding:7px 12px;border-radius:999px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.nota-guardado{font-size:.74rem;color:var(--green);margin:8px 0 0;min-height:1em}
+
+/* Rincón de recuerdos */
+.tarjeta.recuerdos{text-align:left;max-width:480px;padding:26px 20px 22px}
+.recuerdos h2{text-align:center}
+.recuerdos .intro{text-align:center;color:var(--ink-soft);margin:0 0 18px;font-size:.92rem}
+.rec{display:grid;gap:8px;padding:14px 0;border-top:1px dashed rgba(122,102,80,.4)}
+.rec:first-of-type{border-top:0}
+.rec .rec-cab{display:flex;gap:10px;align-items:center}
+.rec .rec-ico{font-size:1.7rem;line-height:1}
+.rec .rec-dia{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);margin:0}
+.rec h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:0;line-height:1.2}
+.rec .rec-fotos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rec .rec-fotos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+.rec .rec-fotos img:only-child{grid-column:1/-1;aspect-ratio:16/10}
+.rec .rec-nota{margin:0;font-family:var(--display);font-style:italic;font-size:1rem;color:var(--ink)}
+.rec .rec-canje{font-size:.72rem;color:var(--green);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0}
+.recuerdos .vacio{text-align:center;color:var(--ink-soft);padding:20px 0 26px;font-family:var(--display);font-style:italic}
+
 .aviso{
-  position:fixed;left:0;right:0;bottom:0;z-index:30;pointer-events:none;
+  position:fixed;left:0;right:0;bottom:0;z-index:50;pointer-events:none;
   display:flex;justify-content:center;
   padding:0 max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
 }
@@ -271,7 +303,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 
 .taller{text-align:center;margin-top:34px;font-size:clamp(1.6rem,7vw,2.2rem);line-height:1;letter-spacing:.15em;user-select:none}
 .pie{text-align:center;color:var(--muted);font-size:.86rem;margin:12px 0 0;font-family:var(--display);font-style:italic}
-.salir{text-align:center;margin-top:18px}
+.pie-botones{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
 
 @media(prefers-reduced-motion:reduce){
   .frente{transition:transform .2s}
@@ -335,7 +367,10 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 
   <p class="taller" aria-hidden="true">🧝‍♀️🎄⛄🎄🧝</p>
   <p class="pie">Hecho con cariño en el taller de Papá Noel, puerta a puerta.</p>
-  <p class="salir"><button type="button" class="enlace" id="btn-cerrar-sesion">Cerrar sesión</button></p>
+  <p class="pie-botones">
+    <button type="button" class="enlace" id="btn-recuerdos">📖 Nuestro diciembre</button>
+    <button type="button" class="enlace" id="btn-cerrar-sesion">Cerrar sesión</button>
+  </p>
 </main>
 
 <div class="velo" id="velo" hidden role="dialog" aria-modal="true" aria-labelledby="t-titulo">
@@ -350,10 +385,41 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
     <p class="firma" id="t-firma"></p>
     <span class="sello">Aprobado por Papá Noel</span>
     <p class="pista" id="t-pista" hidden></p>
+    <div class="nota-leti">
+      <p class="nota-titulo">Tu recuerdo de este día</p>
+      <textarea id="n-texto" rows="2" placeholder="¿Cómo fue? Escribe aquí lo que quieras recordar."></textarea>
+      <div class="nota-foto">
+        <img id="n-foto" alt="" hidden>
+        <input type="file" id="n-archivo" accept="image/*" hidden>
+        <button type="button" class="enlace-ink" id="n-anadir">📷 Añadir una foto</button>
+        <button type="button" class="enlace-ink" id="n-quitar" hidden>Quitar foto</button>
+      </div>
+      <p class="nota-guardado" id="n-guardado"></p>
+    </div>
     <div class="acciones">
       <button type="button" class="boton" id="t-canjear">Canjear este plan</button>
       <button type="button" class="boton secundario" id="t-cerrar">Guardar para luego</button>
     </div>
+  </div>
+</div>
+
+<div class="velo" id="velo-recuerdos" hidden role="dialog" aria-modal="true" aria-labelledby="r-titulo">
+  <div class="tarjeta recuerdos">
+    <h2 id="r-titulo">Nuestro diciembre</h2>
+    <p class="intro" id="r-intro"></p>
+    <div id="r-lista"></div>
+    <div class="acciones"><button type="button" class="boton secundario" id="r-cerrar">Cerrar</button></div>
+  </div>
+</div>
+
+<div class="velo" id="velo-bienvenida" hidden role="dialog" aria-modal="true" aria-labelledby="b-titulo">
+  <div class="tarjeta navidad">
+    <div class="icono">🎄</div>
+    <h2 id="b-titulo">Hola, Leti</h2>
+    <p class="texto">Esto es un calendario de adviento solo para ti. Treinta y una puertas, una por cada día de diciembre, y detrás de cada una un plan para los dos.</p>
+    <p class="texto">Cada mañana a las 07:00 se abre una nueva. Puedes canjear cada plan cuando lo hagamos y guardar aquí una nota o una foto de ese día.</p>
+    <p class="firma">Con todo mi cariño, Vic</p>
+    <div class="acciones"><button type="button" class="boton" id="b-cerrar">Abrir mi calendario</button></div>
   </div>
 </div>
 
@@ -375,22 +441,25 @@ const HORA_TXT = String(CONFIG.hora).padStart(2, '0') + ':00';
 const $ = (id) => document.getElementById(id);
 const KEY = 'adviento-abiertas-' + CONFIG.year;
 const KEY_CANJE = 'adviento-canjeadas-' + CONFIG.year;
+const KEY_NOTAS = 'adviento-notas-' + CONFIG.year;
 const KEY_LLAVE = 'adviento-llave';
 const KEY_SONIDO = 'adviento-sonido';
 const KEY_AVISOS = 'adviento-avisos';
+const KEY_BIENVENIDA = 'adviento-bienvenida';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let SORPRESAS = [];
 let TOTAL = 0;
 let preview = location.hash === '#prueba';
-let abiertas = new Set();
-let canjeadas = {};
 const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch (e) { return def; } };
-const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
-abiertas = new Set(leer(KEY, []));
-canjeadas = leer(KEY_CANJE, {});
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
+let abiertas = new Set(leer(KEY, []));
+let canjeadas = leer(KEY_CANJE, {});
+let notas = leer(KEY_NOTAS, {});
 let sonido = leer(KEY_SONIDO, false) === true;
 let notifActivas = leer(KEY_AVISOS, false) === true;
 function guardar() { escribir(KEY, [...abiertas]); escribir(KEY_CANJE, canjeadas); }
+function guardarNotas() { if (!escribir(KEY_NOTAS, notas)) { aviso('No queda espacio para guardar más fotos en este móvil'); return false; } return true; }
+const vibrar = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
 
 /* ---------- Acceso y descifrado ---------- */
 const CIFRADO = window.SORPRESAS_CIFRADAS;
@@ -428,7 +497,9 @@ function entrar(sorpresas) {
   aplicarPreview();
   programarAviso();
   window.scrollTo(0, 0);
+  if (!leer(KEY_BIENVENIDA, false)) { $('velo-bienvenida').hidden = false; $('b-cerrar').focus(); }
 }
+$('b-cerrar').addEventListener('click', () => { escribir(KEY_BIENVENIDA, true); $('velo-bienvenida').hidden = true; confeti(innerWidth / 2, innerHeight * 0.3, 120, true); });
 
 $('form-login').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -465,6 +536,7 @@ $('btn-cerrar-sesion').addEventListener('click', () => {
 (async function arranque() {
   document.querySelectorAll('.luces').forEach((ul) => { ul.innerHTML = '<li></li>'.repeat(Math.max(12, Math.min(24, Math.floor(innerWidth / 30)))); });
   pintarSonido();
+  if (sonido) prepararSonidos();
   if ('Notification' in window) { $('btn-avisos').hidden = false; pintarAvisos(); }
   if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   if (!subtle || !CIFRADO) return;
@@ -491,24 +563,30 @@ function rellenar(li, s) {
     (canjeadas[s.dia] ? '<span class="hecho" title="Canjeado">✓</span>' : '');
 }
 
+let disponiblesPintadas = -1;
 function render() {
   const ol = $('puertas');
   ol.innerHTML = '';
+  disponiblesPintadas = 0;
   SORPRESAS.forEach((s, i) => {
     const li = document.createElement('li');
-    const esNavidad = s.dia === 25, esNochevieja = s.dia === 31;
-    li.className = 'puerta ' + (esNavidad ? 'grande' : esNochevieja ? 'nochevieja ancha' : s.dia === 30 ? 'ancha ' + COLORES[i % COLORES.length] : COLORES[i % COLORES.length]);
+    const esNavidad = s.dia === 25, esNochebuena = s.dia === 24, esNochevieja = s.dia === 31;
+    const color = COLORES[i % COLORES.length];
+    li.className = 'puerta ' + (esNavidad ? 'grande' : esNochebuena ? 'grande nochebuena' : esNochevieja ? 'nochevieja ancha-movil'
+                               : s.dia === 30 ? 'ancha-movil ' + color : s.dia === 23 ? 'ancha ' + color : color);
     const ok = disponible(s.dia);
+    if (ok) disponiblesPintadas++;
     const ya = ok && abiertas.has(s.dia);
     li.classList.add(ya ? 'abierta' : ok ? 'lista' : 'cerrada');
     const motivo = esNavidad ? '<span class="motivo" aria-hidden="true">🎅</span><span class="motivo der" aria-hidden="true">🦌</span>'
+                 : esNochebuena ? '<span class="motivo" aria-hidden="true">🕯️</span><span class="motivo der" aria-hidden="true">⭐</span>'
                  : '<span class="motivo" aria-hidden="true">' + (esNochevieja ? '🎆' : MOTIVOS[i % MOTIVOS.length]) + '</span>';
     li.innerHTML =
       '<button type="button" aria-label="Puerta ' + s.dia + (ok ? '' : ', se abre el ' + s.dia + ' de diciembre') + '">' +
         '<div class="dentro"></div>' +
         '<div class="frente">' + motivo +
           '<span class="tag"><span class="num">' + s.dia + '</span>' +
-            (esNavidad ? '<span class="etiqueta">Navidad</span>' : esNochevieja ? '<span class="etiqueta">Nochevieja</span>' : '') +
+            (esNavidad ? '<span class="etiqueta">Navidad</span>' : esNochebuena ? '<span class="etiqueta">Nochebuena</span>' : esNochevieja ? '<span class="etiqueta">Nochevieja</span>' : '') +
           '</span>' +
           (ok ? '' : CANDADO) +
         '</div>' +
@@ -539,8 +617,12 @@ function actualizarEstado() {
     txt = 'Feliz año nuevo. Las ' + TOTAL + ' puertas están abiertas';
   } else {
     const hoy = Math.min(t0.getDate(), TOTAL);
-    txt = disponible(hoy) ? 'Puerta ' + hoy + ' abierta. La siguiente, mañana a las ' + HORA_TXT
-                          : 'La puerta ' + hoy + ' se abre hoy a las ' + HORA_TXT;
+    if (disponible(hoy)) txt = 'Puerta ' + hoy + ' abierta. La siguiente, mañana a las ' + HORA_TXT;
+    else {
+      const ms = aperturaDe(hoy) - ahora;
+      if (ms < 3600e3) { const m = Math.max(1, Math.ceil(ms / 60000)); txt = 'La puerta ' + hoy + ' se abre en ' + m + (m === 1 ? ' minuto' : ' minutos'); }
+      else txt = 'La puerta ' + hoy + ' se abre hoy a las ' + HORA_TXT;
+    }
   }
   $('estado-texto').textContent = txt;
 
@@ -551,7 +633,7 @@ function actualizarEstado() {
   let saludo;
   if (enDiciembre && SORPRESAS[ahora.getDate() - 1]) {
     const s = SORPRESAS[ahora.getDate() - 1];
-    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'plan de salir' : 'plan en casa';
+    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'la cena de Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'plan de salir' : 'plan en casa';
     saludo = hola + ', Leti. Hoy es ' + DIAS_SEMANA[ahora.getDay()] + ' y los elfos traen ' + plan + '.';
   } else if (t0 < inicio) {
     saludo = hola + ', Leti. Los elfos están terminando de envolver las puertas.';
@@ -561,14 +643,20 @@ function actualizarEstado() {
   $('saludo').textContent = saludo;
 
   /* Cuenta atrás hasta el regalo grande */
-  const navidad = fechaDe(25);
-  const faltan = Math.round((navidad - t0) / 864e5);
+  const faltan = Math.round((fechaDe(25) - t0) / 864e5);
   const cuenta = $('cuenta');
   if (faltan > 1) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Faltan ' + faltan + ' días para el regalo grande'; }
   else if (faltan === 1) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Mañana llega el regalo grande'; }
   else if (faltan === 0) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Hoy es el día del regalo grande'; }
   else cuenta.hidden = true;
 }
+
+/* Cada 30 s: si se ha abierto una puerta nueva se repinta; si no, se actualiza el contador */
+setInterval(() => {
+  if (!TOTAL) return;
+  const n = SORPRESAS.filter((s) => disponible(s.dia)).length;
+  if (n !== disponiblesPintadas) render(); else actualizarEstado();
+}, 30000);
 
 let avisoTimer;
 function aviso(msg) {
@@ -581,6 +669,7 @@ function aviso(msg) {
 function alPulsar(s, li) {
   if (!disponible(s.dia)) {
     li.classList.remove('tiembla'); void li.offsetWidth; li.classList.add('tiembla');
+    vibrar([20, 40, 20]);
     const dias = Math.round((fechaDe(s.dia) - hoyMedianoche()) / 864e5);
     aviso(dias <= 0 ? 'Esta puerta se abre hoy a las ' + HORA_TXT + '. ¡Ya queda poco!'
         : dias === 1 ? 'Los elfos la terminan mañana a las ' + HORA_TXT + '. ¡Paciencia!'
@@ -593,8 +682,9 @@ function alPulsar(s, li) {
     li.classList.remove('lista'); li.classList.add('abierta');
     actualizarEstado();
     const r = li.getBoundingClientRect();
-    if (s.dia === 25) { confeti(innerWidth / 2, innerHeight * 0.35, 260, true); villancico(); }
-    else { confeti(r.left + r.width / 2, r.top + r.height / 2, 45, false); cascabel(); }
+    if (s.dia === 25) { confeti(innerWidth / 2, innerHeight * 0.35, 260, true); tocar('villancico'); vibrar([60, 40, 60, 40, 120]); }
+    else if (s.dia === 24) { confeti(r.left + r.width / 2, r.top + r.height / 2, 120, true); tocar('cascabel'); vibrar([40, 30, 40]); }
+    else { confeti(r.left + r.width / 2, r.top + r.height / 2, 45, false); tocar('cascabel'); vibrar(30); }
     setTimeout(() => mostrar(s), 700);
   } else {
     mostrar(s);
@@ -606,7 +696,7 @@ function mostrar(s) {
   actual = s;
   const navidad = s.dia === 25;
   $('tarjeta').classList.toggle('navidad', navidad);
-  $('t-dia').textContent = navidad ? '25 de diciembre · Navidad' : s.dia === 31 ? '31 de diciembre · Nochevieja' : 'Puerta ' + s.dia + ' · ' + s.dia + ' de diciembre';
+  $('t-dia').textContent = navidad ? '25 de diciembre · Navidad' : s.dia === 24 ? '24 de diciembre · Nochebuena' : s.dia === 31 ? '31 de diciembre · Nochevieja' : 'Puerta ' + s.dia + ' · ' + s.dia + ' de diciembre';
   $('t-icono').textContent = s.icono;
   $('t-titulo').textContent = s.titulo;
   $('t-texto').textContent = s.texto;
@@ -620,6 +710,7 @@ function mostrar(s) {
   if (s.pista && sig && !abiertas.has(sig.dia)) { pista.hidden = false; pista.innerHTML = 'Mañana… 👀 <b>' + escapar(s.pista) + '</b>'; }
   else pista.hidden = true;
   pintarCanje();
+  pintarNota();
   $('velo').hidden = false;
   $('velo').scrollTop = 0;
   ($('t-canjear').hidden ? $('t-cerrar') : $('t-canjear')).focus();
@@ -643,13 +734,95 @@ $('t-canjear').addEventListener('click', () => {
   if (li) rellenar(li, actual);
   pintarCanje();
   const r = $('tarjeta').getBoundingClientRect();
-  confeti(r.left + r.width / 2, r.top + r.height / 2, 60, false); cascabel();
+  confeti(r.left + r.width / 2, r.top + r.height / 2, 60, false); tocar('cascabel'); vibrar(30);
   aviso(actual.dia === 25 ? '¡Feliz Navidad, Leti!' : 'Plan canjeado. ¡A disfrutarlo!');
 });
 function cerrar() { $('velo').hidden = true; $('t-audio').pause(); }
 $('t-cerrar').addEventListener('click', cerrar);
 $('velo').addEventListener('click', (e) => { if (e.target === $('velo')) cerrar(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('velo').hidden) cerrar(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!$('velo').hidden) cerrar();
+  if (!$('velo-recuerdos').hidden) $('velo-recuerdos').hidden = true;
+});
+
+/* ---------- Notas de Leti (texto y foto por día, guardados en este móvil) ---------- */
+let notaTimer;
+function pintarNota() {
+  const n = notas[actual.dia] || {};
+  $('n-texto').value = n.texto || '';
+  const img = $('n-foto');
+  img.hidden = !n.foto; if (n.foto) img.src = n.foto; else img.removeAttribute('src');
+  $('n-quitar').hidden = !n.foto;
+  $('n-anadir').textContent = n.foto ? '📷 Cambiar la foto' : '📷 Añadir una foto';
+  $('n-guardado').textContent = '';
+}
+$('n-texto').addEventListener('input', () => {
+  clearTimeout(notaTimer);
+  notaTimer = setTimeout(() => {
+    if (!actual) return;
+    const n = notas[actual.dia] || {};
+    n.texto = $('n-texto').value.trim();
+    if (!n.texto && !n.foto) delete notas[actual.dia]; else notas[actual.dia] = n;
+    if (guardarNotas()) $('n-guardado').textContent = 'Guardado ✓';
+  }, 500);
+});
+$('n-anadir').addEventListener('click', () => $('n-archivo').click());
+$('n-archivo').addEventListener('change', () => {
+  const f = $('n-archivo').files && $('n-archivo').files[0];
+  if (!f || !actual) return;
+  const lector = new FileReader();
+  lector.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 800, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const n = notas[actual.dia] || {};
+      n.foto = c.toDataURL('image/jpeg', 0.72);
+      notas[actual.dia] = n;
+      if (guardarNotas()) { pintarNota(); $('n-guardado').textContent = 'Foto guardada ✓'; }
+      else delete n.foto;
+    };
+    img.src = lector.result;
+  };
+  lector.readAsDataURL(f);
+  $('n-archivo').value = '';
+});
+$('n-quitar').addEventListener('click', () => {
+  if (!actual || !notas[actual.dia]) return;
+  delete notas[actual.dia].foto;
+  if (!notas[actual.dia].texto) delete notas[actual.dia];
+  guardarNotas(); pintarNota();
+});
+
+/* ---------- Rincón de recuerdos ---------- */
+function abrirRecuerdos() {
+  const lista = $('r-lista');
+  const dias = SORPRESAS.filter((s) => abiertas.has(s.dia));
+  $('r-intro').textContent = dias.length ? dias.length + (dias.length === 1 ? ' día abierto' : ' días abiertos') + ' de ' + TOTAL : '';
+  if (!dias.length) {
+    lista.innerHTML = '<p class="vacio">Aquí irán apareciendo los días que vayas abriendo, con tus notas y tus fotos.</p>';
+  } else {
+    lista.innerHTML = dias.map((s) => {
+      const n = notas[s.dia] || {};
+      const fotos = [s.foto, n.foto].filter(Boolean).map((f) => '<img src="' + f + '" alt="">').join('');
+      return '<div class="rec">' +
+        '<div class="rec-cab"><span class="rec-ico">' + escapar(s.icono) + '</span><div><p class="rec-dia">' + s.dia + ' de diciembre</p><h3>' + escapar(s.titulo) + '</h3></div></div>' +
+        (fotos ? '<div class="rec-fotos">' + fotos + '</div>' : '') +
+        (n.texto ? '<p class="rec-nota">“' + escapar(n.texto) + '”</p>' : '') +
+        (canjeadas[s.dia] ? '<p class="rec-canje">✓ ' + (s.dia === 25 ? 'Recibido' : 'Canjeado') + ' el ' + escapar(canjeadas[s.dia]) + '</p>' : '') +
+      '</div>';
+    }).join('');
+  }
+  $('velo-recuerdos').hidden = false;
+  $('velo-recuerdos').scrollTop = 0;
+  $('r-cerrar').focus();
+}
+$('btn-recuerdos').addEventListener('click', abrirRecuerdos);
+$('r-cerrar').addEventListener('click', () => { $('velo-recuerdos').hidden = true; });
+$('velo-recuerdos').addEventListener('click', (e) => { if (e.target === $('velo-recuerdos')) $('velo-recuerdos').hidden = true; });
 
 /* Modo prueba: mantener pulsado el título 1,2 s, o abrir el enlace con #prueba */
 function aplicarPreview() {
@@ -665,19 +838,20 @@ titulo.addEventListener('pointerdown', empezar);
 ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => titulo.addEventListener(ev, cancelar));
 titulo.addEventListener('contextmenu', (e) => e.preventDefault());
 $('btn-salir').addEventListener('click', () => { preview = false; aplicarPreview(); });
-$('btn-reiniciar').addEventListener('click', () => { abiertas.clear(); canjeadas = {}; guardar(); render(); aviso('Todas las puertas vuelven a estar cerradas'); });
+$('btn-reiniciar').addEventListener('click', () => {
+  abiertas.clear(); canjeadas = {}; notas = {}; guardar(); guardarNotas();
+  try { localStorage.removeItem(KEY_BIENVENIDA); } catch (e) {}
+  render(); aviso('Todas las puertas vuelven a estar cerradas');
+});
 
 /* Al volver a la app (por ejemplo a las 07:05), refresca puertas y avisos */
 document.addEventListener('visibilitychange', () => { if (!document.hidden && TOTAL) { render(); programarAviso(); } });
 
-/* ---------- Sonido (generado con Web Audio, sin archivos) ---------- */
-let audioCtx = null;
-function ctxAudio() {
-  if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; audioCtx = new AC(); }
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  return audioCtx;
-}
-function nota(c, freq, t, dur, vol, tipo) {
+/* ---------- Sonido ----------
+   Los sonidos se generan una vez (sin archivos) y se reproducen como audio normal,
+   que en iPhone suena aunque el interruptor lateral esté en silencio. */
+let sonidos = null, preparando = null;
+function notaEn(c, freq, t, dur, vol, tipo) {
   const o = c.createOscillator(), g = c.createGain();
   o.type = tipo || 'sine'; o.frequency.value = freq;
   g.gain.setValueAtTime(0.0001, t);
@@ -686,28 +860,65 @@ function nota(c, freq, t, dur, vol, tipo) {
   o.connect(g).connect(c.destination);
   o.start(t); o.stop(t + dur + 0.05);
 }
-function cascabel() {
-  if (!sonido) return; const c = ctxAudio(); if (!c) return;
-  const t = c.currentTime;
-  [[2093, 0], [2637, 0.04], [3136, 0.08], [2637, 0.16], [3520, 0.2]].forEach(([f, d], i) => nota(c, f, t + d, 0.5, 0.12 / (1 + i * 0.3)));
+function wavDesde(buffer) {
+  const n = buffer.length, sr = buffer.sampleRate, datos = buffer.getChannelData(0);
+  const ab = new ArrayBuffer(44 + n * 2), v = new DataView(ab);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt '); v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) { const s = Math.max(-1, Math.min(1, datos[i])); v.setInt16(44 + i * 2, s < 0 ? s * 32768 : s * 32767, true); }
+  return new Blob([ab], { type: 'audio/wav' });
 }
-function villancico() {
-  if (!sonido) return; const c = ctxAudio(); if (!c) return;
-  const E = 659.25, G = 783.99, C = 523.25, D = 587.33, F = 698.46;
-  const q = 0.3; /* negra */
-  const mel = [[E, q], [E, q], [E, 2 * q], [E, q], [E, q], [E, 2 * q], [E, q], [G, q], [C, 1.5 * q], [D, 0.5 * q], [E, 4 * q],
-               [F, q], [F, q], [F, 1.5 * q], [F, 0.5 * q], [F, q], [E, q], [E, q], [E, 0.5 * q], [E, 0.5 * q], [E, q], [D, q], [D, q], [E, q], [D, 2 * q], [G, 2 * q]];
-  let t = c.currentTime + 0.05;
-  mel.forEach(([f, d]) => { nota(c, f, t, d * 0.95, 0.16, 'triangle'); nota(c, f * 2, t, d * 0.5, 0.03, 'sine'); t += d; });
+async function renderizar(dur, fn) {
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if (!OAC) return null;
+  const c = new OAC(1, Math.ceil(44100 * dur), 44100);
+  fn(c);
+  const buf = await c.startRendering();
+  const a = new Audio(URL.createObjectURL(wavDesde(buf)));
+  a.preload = 'auto'; a.setAttribute('playsinline', '');
+  return a;
+}
+function prepararSonidos() {
+  if (sonidos) return Promise.resolve(sonidos);
+  if (preparando) return preparando;
+  preparando = (async () => {
+    try {
+      const cascabel = await renderizar(1.3, (c) => {
+        [[2093, 0], [2637, 0.04], [3136, 0.08], [2637, 0.16], [3520, 0.2]].forEach(([f, d], i) => notaEn(c, f, d, 0.6, 0.35 / (1 + i * 0.3)));
+      });
+      const villancico = await renderizar(9, (c) => {
+        const E = 659.25, G = 783.99, C = 523.25, D = 587.33, F = 698.46, q = 0.3;
+        const mel = [[E, q], [E, q], [E, 2 * q], [E, q], [E, q], [E, 2 * q], [E, q], [G, q], [C, 1.5 * q], [D, 0.5 * q], [E, 4 * q],
+                     [F, q], [F, q], [F, 1.5 * q], [F, 0.5 * q], [F, q], [E, q], [E, q], [E, 0.5 * q], [E, 0.5 * q], [E, q], [D, q], [D, q], [E, q], [D, 2 * q], [G, 2 * q]];
+        let t = 0.05;
+        mel.forEach(([f, d]) => { notaEn(c, f, t, d * 0.95, 0.4, 'triangle'); notaEn(c, f * 2, t, d * 0.5, 0.08, 'sine'); t += d; });
+      });
+      sonidos = { cascabel, villancico };
+    } catch (e) { sonidos = {}; }
+    return sonidos;
+  })();
+  return preparando;
+}
+function tocar(nombre) {
+  if (!sonido) return;
+  const reproducir = (s) => { const a = s && s[nombre]; if (!a) return; try { a.pause(); a.currentTime = 0; a.play().catch(() => {}); } catch (e) {} };
+  if (sonidos) reproducir(sonidos); else prepararSonidos().then(reproducir);
 }
 function pintarSonido() {
   const b = $('btn-sonido');
   b.setAttribute('aria-pressed', sonido ? 'true' : 'false');
   b.textContent = sonido ? '🔔 Sonido encendido' : '🔕 Sonido apagado';
 }
-$('btn-sonido').addEventListener('click', () => {
+$('btn-sonido').addEventListener('click', async () => {
   sonido = !sonido; escribir(KEY_SONIDO, sonido); pintarSonido();
-  if (sonido) cascabel();
+  if (!sonido) return;
+  const s = await prepararSonidos();
+  /* Desbloquea ambos sonidos dentro del toque del usuario (requisito de iPhone) y suena el cascabel */
+  Object.values(s).forEach((a) => { try { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); } catch (e) {} });
+  setTimeout(() => tocar('cascabel'), 150);
+  aviso('Sonido encendido. Si no lo oyes, sube el volumen del móvil');
 });
 
 /* ---------- Confeti ---------- */

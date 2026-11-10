@@ -1,5 +1,5 @@
 /* Service worker: deja la app disponible sin conexión y muestra los avisos de puerta abierta. */
-const CACHE = 'adviento-v1';
+const CACHE = 'adviento-v2';
 const BASE = ['./', './index.html', './sorpresas.enc.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
