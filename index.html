@@ -687,7 +687,7 @@ function actualizarEstado() {
   let saludo;
   if (enDiciembre && SORPRESAS[ahora.getDate() - 1]) {
     const s = SORPRESAS[ahora.getDate() - 1];
-    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'la cena de Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'un regalo para salir de casa' : 'un regalo para disfrutar en casa';
+    const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'un regalo para lucir en Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'un regalo para salir de casa' : 'un regalo para disfrutar en casa';
     saludo = hola + ', Leti. Hoy es ' + DIAS_SEMANA[ahora.getDay()] + ' y los elfos traen ' + plan + '.';
   } else if (t0 < inicio) {
     saludo = hola + ', Leti. Los elfos están terminando de envolver las puertas.';
