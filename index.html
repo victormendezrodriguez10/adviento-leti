@@ -928,20 +928,13 @@ $('btn-recuerdos').addEventListener('click', abrirRecuerdos);
 $('r-cerrar').addEventListener('click', () => { $('velo-recuerdos').hidden = true; });
 $('velo-recuerdos').addEventListener('click', (e) => { if (e.target === $('velo-recuerdos')) $('velo-recuerdos').hidden = true; });
 
-/* Modo prueba: mantener pulsado el título 1,2 s, o abrir el enlace con #prueba */
+/* Modo prueba: solo abriendo el enlace con #prueba al final */
 function aplicarPreview() {
   document.body.classList.toggle('modo-prueba', preview);
   $('banner-prueba').hidden = !preview;
   render();
   pintarAlbum();
 }
-let pulsando;
-const titulo = $('titulo');
-const empezar = () => { clearTimeout(pulsando); pulsando = setTimeout(() => { preview = !preview; aplicarPreview(); aviso(preview ? 'Modo prueba activado' : 'Modo prueba desactivado'); }, 1200); };
-const cancelar = () => clearTimeout(pulsando);
-titulo.addEventListener('pointerdown', empezar);
-['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => titulo.addEventListener(ev, cancelar));
-titulo.addEventListener('contextmenu', (e) => e.preventDefault());
 $('btn-salir').addEventListener('click', () => { preview = false; aplicarPreview(); });
 $('btn-reiniciar').addEventListener('click', () => {
   abiertas.clear(); canjeadas = {}; notas = {}; guardar(); guardarNotas();

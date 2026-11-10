@@ -35,4 +35,4 @@ La página pide usuario y contraseña. Las sorpresas están cifradas en `sorpres
 
 ## Modo prueba
 
-Una vez dentro, abre la página con `#prueba` al final de la dirección o mantén pulsado el título durante un segundo para desbloquear todas las puertas. Dentro hay un botón para volver a cerrarlas.
+Una vez dentro, abre la página con `#prueba` al final de la dirección para desbloquear todas las puertas. Dentro hay un botón para volver a cerrarlas y otro para salir del modo prueba.
