@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Adviento de Leti">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Calendario de adviento sorpresa para Leti: 31 puertas, una por cada día de diciembre.">
+<meta name="description" content="Calendario de adviento sorpresa para Leti: un diciembre lleno de puertas con regalo.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=2">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -355,9 +355,9 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
 
   <header class="cabecera">
     <p class="trineo" aria-hidden="true"><span class="luna"></span>🦌🦌🦌🛷🎅</p>
-    <p class="eyebrow" id="eyebrow">Diciembre 2026 · 31 puertas</p>
+    <p class="eyebrow" id="eyebrow">Diciembre 2026</p>
     <h1 id="titulo">El calendario de adviento de <b>Leti</b></h1>
-    <p class="sub">Los elfos han preparado una puerta para cada día de diciembre. Detrás de cada una, un regalo solo para ti.</p>
+    <p class="sub">Los elfos han llenado diciembre de puertas. Detrás de cada una, un regalo solo para ti.</p>
     <p class="saludo" id="saludo"></p>
     <div class="estados">
       <div class="estado" id="estado" aria-live="polite"><span class="elfo" aria-hidden="true">🧝</span><span id="estado-texto">Cargando…</span></div>
@@ -429,7 +429,7 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
   <div class="tarjeta navidad">
     <div class="icono">🎄</div>
     <h2 id="b-titulo">Hola, Leti</h2>
-    <p class="texto">Esto es un calendario de adviento solo para ti. Treinta y una puertas, una por cada día de diciembre, y detrás de cada una un regalo para ti.</p>
+    <p class="texto">Esto es un calendario de adviento solo para ti. Un diciembre lleno de puertas, y detrás de cada una un regalo para ti.</p>
     <p class="texto">Cada mañana a las 07:00 se abre una nueva. Puedes canjear cada regalo cuando lo abramos juntos y guardar aquí una nota o una foto de ese día.</p>
     <p class="firma">Con todo mi cariño, Vic</p>
     <div class="acciones"><button type="button" class="boton" id="b-cerrar">Abrir mi calendario</button></div>
@@ -460,7 +460,7 @@ const KEY_SONIDO = 'adviento-sonido';
 const KEY_AVISOS = 'adviento-avisos';
 const KEY_BIENVENIDA = 'adviento-bienvenida';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let SORPRESAS = [];
+let SORPRESAS = [], ULTIMO = 31;
 let TOTAL = 0;
 let preview = location.hash === '#prueba';
 const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch (e) { return def; } };
@@ -542,6 +542,7 @@ function olvidarLlave() { try { localStorage.removeItem(KEY_LLAVE); } catch (e) 
 function entrar(sorpresas) {
   SORPRESAS = sorpresas.slice().sort((a, b) => a.dia - b.dia);
   TOTAL = SORPRESAS.length;
+  ULTIMO = SORPRESAS[TOTAL - 1].dia;
   $('login').hidden = true;
   $('app').hidden = false;
   $('eyebrow').textContent = 'Diciembre ' + CONFIG.year + ' · ' + TOTAL + ' puertas';
@@ -627,7 +628,7 @@ function render() {
     const esNavidad = s.dia === 25, esNochebuena = s.dia === 24, esNochevieja = s.dia === 31;
     const color = COLORES[i % COLORES.length];
     li.className = 'puerta ' + (esNavidad ? 'grande' : esNochebuena ? 'grande nochebuena' : esNochevieja ? 'nochevieja ancha-movil'
-                               : s.dia === 30 ? 'ancha-movil ' + color : s.dia === 23 ? 'ancha ' + color : color);
+                               : s.dia === 30 || s.dia === 22 || s.dia === 23 ? 'ancha-movil ' + color : color);
     const ok = disponible(s.dia);
     if (ok) disponiblesPintadas++;
     const ya = ok && abiertas.has(s.dia);
@@ -654,7 +655,7 @@ function render() {
 
 function actualizarEstado() {
   const ahora = new Date(), t0 = hoyMedianoche();
-  const inicio = fechaDe(1), fin = fechaDe(TOTAL);
+  const inicio = fechaDe(SORPRESAS[0].dia), fin = fechaDe(ULTIMO);
   const porAbrir = SORPRESAS.filter((s) => disponible(s.dia) && !abiertas.has(s.dia)).length;
   let txt;
   if (preview) {
@@ -667,12 +668,17 @@ function actualizarEstado() {
   } else if (porAbrir === 1) {
     const d = SORPRESAS.find((s) => disponible(s.dia) && !abiertas.has(s.dia)).dia;
     txt = 'Hoy puedes abrir la puerta ' + d;
-  } else if (t0 >= fin && disponible(TOTAL)) {
+  } else if (t0 >= fin && disponible(ULTIMO)) {
     txt = 'Feliz año nuevo. Las ' + TOTAL + ' puertas están abiertas';
   } else {
-    const hoy = Math.min(t0.getDate(), TOTAL);
-    if (disponible(hoy)) txt = 'Puerta ' + hoy + ' abierta. La siguiente, mañana a las ' + HORA_TXT;
-    else {
+    const hoy = t0.getDate();
+    const deHoy = SORPRESAS.find((s) => s.dia === hoy);
+    const sig = SORPRESAS.find((s) => !disponible(s.dia));
+    const cuando = !sig ? '' : sig.dia === hoy + 1 ? 'mañana a las ' + HORA_TXT : 'el ' + sig.dia + ' de diciembre';
+    if (!deHoy || disponible(hoy)) {
+      const ult = SORPRESAS.filter((s) => disponible(s.dia)).pop();
+      txt = 'Puerta ' + ult.dia + ' abierta. La siguiente, ' + cuando;
+    } else {
       const ms = aperturaDe(hoy) - ahora;
       if (ms < 3600e3) { const m = Math.max(1, Math.ceil(ms / 60000)); txt = 'La puerta ' + hoy + ' se abre en ' + m + (m === 1 ? ' minuto' : ' minutos'); }
       else txt = 'La puerta ' + hoy + ' se abre hoy a las ' + HORA_TXT;
@@ -685,12 +691,15 @@ function actualizarEstado() {
   const hola = h < 13 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
   const enDiciembre = ahora.getFullYear() === CONFIG.year && ahora.getMonth() === 11;
   let saludo;
-  if (enDiciembre && SORPRESAS[ahora.getDate() - 1]) {
-    const s = SORPRESAS[ahora.getDate() - 1];
+  const s = enDiciembre && SORPRESAS.find((x) => x.dia === ahora.getDate());
+  if (s) {
     const plan = s.dia === 25 ? 'el regalo grande' : s.dia === 24 ? 'un regalo para lucir en Nochebuena' : s.dia === 31 ? 'la última puerta del año' : s.fuera ? 'un regalo para salir de casa' : 'un regalo para disfrutar en casa';
     saludo = hola + ', Leti. Hoy es ' + DIAS_SEMANA[ahora.getDay()] + ' y los elfos traen ' + plan + '.';
   } else if (t0 < inicio) {
     saludo = hola + ', Leti. Los elfos están terminando de envolver las puertas.';
+  } else if (t0 < fin) {
+    const sig = SORPRESAS.find((x) => fechaDe(x.dia) > t0);
+    saludo = hola + ', Leti. Hoy los elfos descansan: vuelven el ' + sig.dia + ' con más regalos.';
   } else {
     saludo = hola + ', Leti. Feliz año nuevo.';
   }
@@ -759,9 +768,9 @@ function mostrar(s) {
   foto.hidden = !s.foto; if (s.foto) foto.src = s.foto; else foto.removeAttribute('src');
   const audio = $('t-audio');
   audio.hidden = !s.audio; if (s.audio) audio.src = s.audio; else { audio.pause(); audio.removeAttribute('src'); }
-  const sig = SORPRESAS.find((x) => x.dia === s.dia + 1);
+  const sig = SORPRESAS.find((x) => x.dia > s.dia);
   const pista = $('t-pista');
-  if (s.pista && sig && !abiertas.has(sig.dia)) { pista.hidden = false; pista.innerHTML = 'Mañana… 👀 <b>' + escapar(s.pista) + '</b>'; }
+  if (s.pista && sig && !abiertas.has(sig.dia)) { pista.hidden = false; pista.innerHTML = (sig.dia === s.dia + 1 ? 'Mañana' : 'El día ' + sig.dia) + '… 👀 <b>' + escapar(s.pista) + '</b>'; }
   else pista.hidden = true;
   pintarCanje();
   pintarNota();
