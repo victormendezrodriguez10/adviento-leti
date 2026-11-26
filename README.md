@@ -8,7 +8,7 @@ La página pide usuario y contraseña. Las sorpresas están cifradas en `sorpres
 
 - Puertas como regalos envueltos; confeti y cascabel al abrir (el sonido se activa con el botón de la cabecera).
 - Cada sorpresa se puede **canjear**: queda con sello "canjeado" y fecha.
-- Cada tarjeta termina con una **pista** del día siguiente.
+- Cada tarjeta puede terminar con una **pista** del día siguiente (campo opcional; en 2026 no se usan).
 - Saludo del día, contador hasta el regalo grande y estado de las puertas.
 - Funciona **sin conexión** una vez abierta (service worker) y se puede añadir a la pantalla de inicio.
 - **Avisos a las 07:00** si se activan en la cabecera. Solo suenan si la app está abierta o en segundo plano en ese momento; un aviso con la app cerrada necesitaría un servidor de notificaciones push.
