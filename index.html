@@ -361,7 +361,6 @@ h1 b{font-weight:600;font-style:normal;color:var(--gold-soft)}
     <p class="saludo" id="saludo"></p>
     <div class="estados">
       <div class="estado" id="estado" aria-live="polite"><span class="elfo" aria-hidden="true">🧝</span><span id="estado-texto">Cargando…</span></div>
-      <div class="estado" id="cuenta" hidden><span class="elfo" aria-hidden="true">🎁</span><span id="cuenta-texto"></span></div>
     </div>
     <div class="ajustes">
       <button type="button" class="enlace" id="btn-sonido" aria-pressed="false">🔕 Sonido apagado</button>
@@ -706,13 +705,6 @@ function actualizarEstado() {
   }
   $('saludo').textContent = saludo;
 
-  /* Cuenta atrás hasta el regalo grande */
-  const faltan = Math.round((fechaDe(25) - t0) / 864e5);
-  const cuenta = $('cuenta');
-  if (faltan > 1) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Faltan ' + faltan + ' días para el regalo grande'; }
-  else if (faltan === 1) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Mañana llega el regalo grande'; }
-  else if (faltan === 0) { cuenta.hidden = false; $('cuenta-texto').textContent = 'Hoy es el día del regalo grande'; }
-  else cuenta.hidden = true;
 }
 
 /* Cada 30 s: si se ha abierto una puerta nueva se repinta; si no, se actualiza el contador */

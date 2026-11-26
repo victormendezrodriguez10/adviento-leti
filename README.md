@@ -10,7 +10,7 @@ La página pide usuario y contraseña. Las sorpresas están cifradas en `sorpres
 - **Música de fondo** (`theme.mp3`) en bucle desde el primer toque; se calla al salir de la app y mientras suena una nota de voz. El botón de sonido de la cabecera apaga música y efectos (viene encendido).
 - Cada sorpresa se puede **canjear**: queda con sello "canjeado" y fecha.
 - Cada tarjeta puede terminar con una **pista** del día siguiente (campo opcional; en 2026 no se usan).
-- Saludo del día, contador hasta el regalo grande y estado de las puertas.
+- Saludo del día y estado de las puertas.
 - Funciona **sin conexión** una vez abierta (service worker) y se puede añadir a la pantalla de inicio.
 - **Avisos a las 07:00** si se activan en la cabecera. Solo suenan si la app está abierta o en segundo plano en ese momento; un aviso con la app cerrada necesitaría un servidor de notificaciones push.
 - Soporta **fotos y notas de voz** en las tarjetas, cifradas igual que el texto.
