@@ -43,7 +43,23 @@ const iv = crypto.getRandomValues(new Uint8Array(12));
 const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(usuario + '\n' + clave), 'PBKDF2', false, ['deriveKey']);
 const llave = await crypto.subtle.deriveKey(
   { name: 'PBKDF2', salt, iterations: iteraciones, hash: 'SHA-256' },
-  material, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+  material, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+
+// Si ya hay un archivo cifrado, el usuario y la clave tienen que abrirlo: así no se publica
+// por error un calendario cifrado con otra contraseña (ella no podría entrar).
+if (existsSync(rutaSalida)) {
+  const previo = readFileSync(rutaSalida, 'utf8');
+  const ivPrevio = previo.match(/"iv":"([^"]+)"/), datosPrevios = previo.match(/"datos":"([^"]+)"/);
+  if (ivPrevio && datosPrevios) {
+    try {
+      await crypto.subtle.decrypt({ name: 'AES-GCM', iv: Buffer.from(ivPrevio[1], 'base64') }, llave, Buffer.from(datosPrevios[1], 'base64'));
+    } catch {
+      console.error('El usuario o la clave no coinciden con los del sorpresas.enc.js actual. No se ha cambiado nada.');
+      console.error('Si quieres cambiar la contraseña a propósito, borra antes sorpresas.enc.js.');
+      process.exit(1);
+    }
+  }
+}
 const datos = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, llave, new TextEncoder().encode(JSON.stringify(sorpresas))));
 
 const b64 = (u) => Buffer.from(u).toString('base64');
