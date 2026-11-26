@@ -1,5 +1,5 @@
 /* Service worker: deja la app disponible sin conexión y muestra los avisos de puerta abierta. */
-const CACHE = 'adviento-v4';
+const CACHE = 'adviento-v5';
 const BASE = ['./', './index.html', './sorpresas.enc.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
@@ -13,6 +13,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  // La música va directa a la red: el audio se pide por trozos y eso no se lleva bien con la caché.
+  if (req.headers.has('range') || new URL(req.url).pathname.endsWith('.mp3')) return;
   const url = new URL(req.url);
   const propio = url.origin === location.origin;
   const fuente = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';

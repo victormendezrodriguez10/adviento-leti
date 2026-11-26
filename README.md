@@ -6,7 +6,8 @@ La página pide usuario y contraseña. Las sorpresas están cifradas en `sorpres
 
 ## Qué hace
 
-- Puertas como regalos envueltos; confeti y cascabel al abrir (el sonido se activa con el botón de la cabecera).
+- Puertas como regalos envueltos; confeti y cascabel al abrir.
+- **Música de fondo** (`theme.mp3`) en bucle desde el primer toque; se calla al salir de la app y mientras suena una nota de voz. El botón de sonido de la cabecera apaga música y efectos (viene encendido).
 - Cada sorpresa se puede **canjear**: queda con sello "canjeado" y fecha.
 - Cada tarjeta puede terminar con una **pista** del día siguiente (campo opcional; en 2026 no se usan).
 - Saludo del día, contador hasta el regalo grande y estado de las puertas.

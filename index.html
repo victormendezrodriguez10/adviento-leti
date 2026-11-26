@@ -468,7 +468,7 @@ const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); r
 let abiertas = new Set(leer(KEY, []));
 let canjeadas = leer(KEY_CANJE, {});
 let notas = leer(KEY_NOTAS, {});
-let sonido = leer(KEY_SONIDO, false) === true;
+let sonido = leer(KEY_SONIDO, true) !== false;   /* encendido salvo que ella lo apague */
 let notifActivas = leer(KEY_AVISOS, false) === true;
 let sonidos = null, preparando = null;   /* audios generados (ver sección Sonido) */
 
@@ -580,6 +580,7 @@ $('form-login').addEventListener('submit', async (e) => {
 $('btn-cerrar-sesion').addEventListener('click', () => {
   olvidarLlave();
   SORPRESAS = []; TOTAL = 0;
+  pararMusica();
   $('puertas').innerHTML = '';
   $('app').hidden = true;
   $('login').hidden = false;
@@ -954,7 +955,10 @@ $('btn-reiniciar').addEventListener('click', () => {
 });
 
 /* Al volver a la app (por ejemplo a las 07:05), refresca puertas y avisos */
-document.addEventListener('visibilitychange', () => { if (!document.hidden && TOTAL) { render(); programarAviso(); } });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { pararMusica(); return; }
+  if (TOTAL) { render(); programarAviso(); sonarMusica(); }
+});
 
 /* ---------- Sonido ----------
    Los sonidos se generan una vez (sin archivos) y se reproducen como audio normal,
@@ -1011,7 +1015,11 @@ function prepararSonidos() {
 }
 function tocar(nombre) {
   if (!sonido) return;
-  const reproducir = (s) => { const a = s && s[nombre]; if (!a) return; try { a.pause(); a.currentTime = 0; a.play().catch(() => {}); } catch (e) {} };
+  const reproducir = (s) => {
+    const a = s && s[nombre]; if (!a) return;
+    if (nombre === 'villancico') { pararMusica(); a.onended = sonarMusica; }   /* que no se pisen dos melodías */
+    try { a.pause(); a.currentTime = 0; a.play().catch(() => {}); } catch (e) {}
+  };
   if (sonidos) reproducir(sonidos); else prepararSonidos().then(reproducir);
 }
 function pintarSonido() {
@@ -1021,13 +1029,30 @@ function pintarSonido() {
 }
 $('btn-sonido').addEventListener('click', async () => {
   sonido = !sonido; escribir(KEY_SONIDO, sonido); pintarSonido();
-  if (!sonido) return;
+  if (!sonido) { pararMusica(); return; }
+  sonarMusica();
   const s = await prepararSonidos();
   /* Desbloquea ambos sonidos dentro del toque del usuario (requisito de iPhone) y suena el cascabel */
   Object.values(s).forEach((a) => { try { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); } catch (e) {} });
   setTimeout(() => tocar('cascabel'), 150);
   aviso('Sonido encendido. Si no lo oyes, sube el volumen del móvil');
 });
+
+/* ---------- Música de fondo ----------
+   theme.mp3 suena en bucle mientras el sonido esté encendido y se haya entrado en el calendario.
+   Los navegadores solo dejan arrancar audio tras un toque, así que se intenta en cada toque.
+   Se calla al salir de la app y mientras suena la nota de voz de una tarjeta. */
+const musica = new Audio('theme.mp3');
+musica.loop = true; musica.preload = 'none'; musica.setAttribute('playsinline', '');
+function sonarMusica() {
+  if (!sonido || !TOTAL || document.hidden || !$('t-audio').paused) return;
+  if (musica.paused) musica.play().catch(() => {});
+}
+function pararMusica() { musica.pause(); }
+document.addEventListener('pointerdown', sonarMusica, true);
+$('t-audio').addEventListener('play', pararMusica);
+$('t-audio').addEventListener('pause', sonarMusica);
+$('t-audio').addEventListener('ended', sonarMusica);
 
 /* ---------- Confeti ---------- */
 const cCanvas = $('confeti'), cctx = cCanvas.getContext('2d');
