@@ -551,7 +551,7 @@ function entrar(sorpresas) {
   pedirPersistencia();
   pintarAlbum();
   window.scrollTo(0, 0);
-  if (!leer(KEY_BIENVENIDA, false)) { $('velo-bienvenida').hidden = false; $('b-cerrar').focus(); }
+  if (!leer(KEY_BIENVENIDA, false)) { $('velo-bienvenida').hidden = false; $('b-cerrar').focus({ preventScroll: true }); }
 }
 $('b-cerrar').addEventListener('click', () => { escribir(KEY_BIENVENIDA, true); $('velo-bienvenida').hidden = true; confeti(innerWidth / 2, innerHeight * 0.3, 120, true); });
 
@@ -776,7 +776,8 @@ function mostrar(s) {
   pintarNota();
   $('velo').hidden = false;
   $('velo').scrollTop = 0;
-  ($('t-canjear').hidden ? $('t-cerrar') : $('t-canjear')).focus();
+  ($('t-canjear').hidden ? $('t-cerrar') : $('t-canjear')).focus({ preventScroll: true });
+  $('velo').scrollTop = 0;
 }
 function pintarCanje() {
   const s = actual, navidad = s.dia === 25;
@@ -931,7 +932,8 @@ function abrirRecuerdos() {
   }
   $('velo-recuerdos').hidden = false;
   $('velo-recuerdos').scrollTop = 0;
-  $('r-cerrar').focus();
+  $('r-cerrar').focus({ preventScroll: true });
+  $('velo-recuerdos').scrollTop = 0;
 }
 $('btn-recuerdos').addEventListener('click', abrirRecuerdos);
 $('r-cerrar').addEventListener('click', () => { $('velo-recuerdos').hidden = true; });
